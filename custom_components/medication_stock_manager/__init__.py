@@ -1,7 +1,6 @@
 """Medication Stock Manager integration setup."""
 
 from __future__ import annotations
-from homeassistant.helpers import config_validation as cv
 
 from pathlib import Path
 import logging
