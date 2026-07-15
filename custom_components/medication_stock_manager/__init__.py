@@ -61,7 +61,7 @@ ADD_ITEM_SCHEMA = vol.Schema(
     {
         vol.Required(CONF_NAME): cv.string,
         vol.Optional("owner", default=""): cv.string,
-        vol.Optional("item_type", default="custom"): cv.string,
+        vol.Optional("item_type", default="custom_med"): cv.string,
         vol.Optional("unit", default="items"): cv.string,
         vol.Optional("icon", default="mdi:pill"): cv.string,
         vol.Optional("stock", default=0): vol.Coerce(float),

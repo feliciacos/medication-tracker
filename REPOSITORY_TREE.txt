@@ -43,6 +43,7 @@ docs/VERIFY_FRONTEND_VERSION.md
 examples/dashboards/celine_medication_stock_view.yaml
 examples/dashboards/felicia_medication_stock_view.yaml
 examples/dashboards/medication_stock_overview_view.yaml
+examples/dashboards/owner_medication_stock_bubble_card.yaml
 examples/personal_setup/PERSONAL_SETUP_REFERENCE.yaml
 hacs.json
 scripts/validate_repository.py

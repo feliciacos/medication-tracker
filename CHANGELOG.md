@@ -5,17 +5,32 @@ All notable changes to this project are documented here. The project follows
 
 ## [Unreleased]
 
+## [1.4.3] - 2026-07-16
+
+### Added
+
+- Added `custom_med` and `custom_supply` item types for user-defined items.
+- Added explicit custom-supply grouping in the bundled dashboard cards.
+- Documented Bubble Card as the only third-party HACS frontend card used by
+  the optional owner-calendar dashboard example.
+
+### Changed
+
+- Existing legacy `custom` items are migrated automatically to `custom_med` so
+  current installations remain compatible.
+- Custom medication and custom supply types preserve the manually entered unit
+  instead of replacing it with a predefined unit.
+
 ## [1.4.2] - 2026-07-15
 
-### Fixed
+### Changed
 
-- Reordered the sidebar settings grid so the title and icon text fields share
-  the top row and the two checkbox settings share the row below.
-
-### Privacy
-
-- Added private project-context and personalized example files to `.gitignore`
-  so they are not included in future public commits.
+- Reordered sidebar settings so title and icon are on the top row and the two
+  checkbox settings are on the bottom row.
+- Updated synchronized runtime, frontend, manifest, validation, and release
+  versions to `1.4.2`.
+- Added ignore rules for private project-context files and personalized setup
+  examples.
 
 ## [1.4.1] - 2026-07-15
 
@@ -73,3 +88,4 @@ All notable changes to this project are documented here. The project follows
 [1.4.1]: https://github.com/feliciacos/medication-tracker/releases/tag/v1.4.1
 
 [1.4.2]: https://github.com/feliciacos/medication-tracker/releases/tag/v1.4.2
+[1.4.3]: https://github.com/feliciacos/medication-tracker/releases/tag/v1.4.3

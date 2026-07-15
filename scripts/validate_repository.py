@@ -14,7 +14,7 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 DOMAIN = "medication_stock_manager"
-EXPECTED_VERSION = "1.4.2"
+EXPECTED_VERSION = "1.4.3"
 INTEGRATION = ROOT / "custom_components" / DOMAIN
 
 
@@ -44,6 +44,18 @@ frontend = INTEGRATION / "frontend/medication-stock-manager-card.js"
 frontend_text = frontend.read_text(encoding="utf-8")
 if f'MSM_CARD_VERSION = "{EXPECTED_VERSION}"' not in frontend_text:
     fail("frontend version is not synchronized")
+if 'custom_med: "items"' not in frontend_text:
+    fail("frontend custom_med item type is missing")
+if 'custom_supply: "items"' not in frontend_text:
+    fail("frontend custom_supply item type is missing")
+if '"custom_supply"' not in frontend_text:
+    fail("frontend custom supply category handling is missing")
+
+manager_text = (INTEGRATION / "manager.py").read_text(encoding="utf-8")
+if 'if item_type == "custom":' not in manager_text:
+    fail("legacy custom item migration is missing")
+if '"custom_supply"' not in manager_text:
+    fail("backend custom supply category handling is missing")
 
 init_text = (INTEGRATION / "__init__.py").read_text(encoding="utf-8")
 if "CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)" not in init_text:

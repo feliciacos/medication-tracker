@@ -100,7 +100,9 @@ class MedicationStockManager:
                     "id": item_id,
                     "owner": owner_id,
                     "name": str(item.get("name") or item_id.replace("_", " ").title()),
-                    "item_type": str(item.get("item_type", "custom")),
+                    "item_type": self._normalize_item_type(
+                        item.get("item_type", "custom_med")
+                    ),
                     "unit": str(item.get("unit", "items")) or "items",
                     "icon": str(item.get("icon", "mdi:pill")) or "mdi:pill",
                     "stock": self._legacy_number(item, "stock_entity", item.get("stock", 0)),
@@ -293,7 +295,9 @@ class MedicationStockManager:
             identifiers={(DOMAIN, f"item:{item['id']}")},
             name=item["name"],
             manufacturer="Medication Stock Manager",
-            model=str(item.get("item_type", "custom")).replace("_", " ").title(),
+            model=self._normalize_item_type(
+                item.get("item_type", "custom_med")
+            ).replace("_", " ").title(),
             sw_version=VERSION,
             via_device=(DOMAIN, f"owner:{item['owner']}"),
         )
@@ -665,14 +669,13 @@ class MedicationStockManager:
             item_id = f"{base_id}_{suffix}"
             suffix += 1
 
+        item_type = self._normalize_item_type(data.get("item_type", "custom_med"))
         item = {
             "id": item_id,
             "owner": owner,
             "name": name,
-            "item_type": str(data.get("item_type", "custom")),
-            "display_order": self._next_display_order(
-                owner, str(data.get("item_type", "custom"))
-            ),
+            "item_type": item_type,
+            "display_order": self._next_display_order(owner, item_type),
             "unit": str(data.get("unit", "items")).strip() or "items",
             "icon": str(data.get("icon", "mdi:pill")).strip() or "mdi:pill",
             "stock": max(float(data.get("stock", 0)), 0),
@@ -709,7 +712,6 @@ class MedicationStockManager:
             item["threshold"] = max(float(data["threshold"]), 0)
         for field in (
             "name",
-            "item_type",
             "unit",
             "icon",
             "schedule_mode",
@@ -720,6 +722,8 @@ class MedicationStockManager:
         ):
             if field in data:
                 item[field] = str(data[field]).strip()
+        if "item_type" in data:
+            item["item_type"] = self._normalize_item_type(data["item_type"])
         if "owner" in data:
             item["owner"] = self._require_owner(str(data["owner"]))["id"]
         for field in ("package_size", "usage_per_day"):
@@ -1261,8 +1265,21 @@ class MedicationStockManager:
     # Summaries
     # ------------------------------------------------------------------
     @staticmethod
-    def _item_category(item_type: str) -> str:
-        return "supply" if item_type in {"syringe", "catheter", "sheet"} else "medication"
+    def _normalize_item_type(value: Any) -> str:
+        """Normalize legacy custom items while preserving other item types."""
+        item_type = str(value or "custom_med").strip().lower()
+        if item_type == "custom":
+            return "custom_med"
+        return item_type or "custom_med"
+
+    @classmethod
+    def _item_category(cls, item_type: str) -> str:
+        normalized = cls._normalize_item_type(item_type)
+        return (
+            "supply"
+            if normalized in {"syringe", "catheter", "sheet", "custom_supply"}
+            else "medication"
+        )
 
     def _next_display_order(self, owner: str, item_type: str) -> int:
         category = self._item_category(item_type)
@@ -1270,7 +1287,10 @@ class MedicationStockManager:
             int(item.get("display_order", 0))
             for item in self.items.values()
             if item.get("owner") == owner
-            and self._item_category(str(item.get("item_type", "custom"))) == category
+            and self._item_category(
+                str(item.get("item_type", "custom_med"))
+            )
+            == category
         ]
         return (max(existing) if existing else 0) + 10
 
@@ -1281,7 +1301,7 @@ class MedicationStockManager:
             key=lambda value: (
                 value.get("owner", ""),
                 0
-                if self._item_category(str(value.get("item_type", "custom")))
+                if self._item_category(str(value.get("item_type", "custom_med")))
                 == "medication"
                 else 1,
                 int(value.get("display_order", 1000)),
@@ -1301,9 +1321,11 @@ class MedicationStockManager:
                         item["owner"], {"name": item["owner"]}
                     )["name"],
                     "name": item["name"],
-                    "item_type": item.get("item_type", "custom"),
+                    "item_type": self._normalize_item_type(
+                        item.get("item_type", "custom_med")
+                    ),
                     "category": self._item_category(
-                        str(item.get("item_type", "custom"))
+                        str(item.get("item_type", "custom_med"))
                     ),
                     "display_order": int(item.get("display_order", 1000)),
                     "unit": item.get("unit", "items"),

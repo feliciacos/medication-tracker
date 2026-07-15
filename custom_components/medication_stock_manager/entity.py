@@ -44,7 +44,7 @@ def item_device_info(item: dict[str, Any]) -> DeviceInfo:
         identifiers={(DOMAIN, f"item:{item['id']}")},
         name=item["name"],
         manufacturer="Medication Stock Manager",
-        model=str(item.get("item_type", "custom")).replace("_", " ").title(),
+        model=str(item.get("item_type", "custom_med")).replace("_", " ").title(),
         sw_version=VERSION,
         via_device=(DOMAIN, f"owner:{item['owner']}"),
     )

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 DOMAIN = "medication_stock_manager"
-VERSION = "1.4.2"
+VERSION = "1.4.3"
 PLATFORMS = ["sensor", "number", "switch", "button", "calendar"]
 
 STORAGE_KEY = f"{DOMAIN}.items"
@@ -28,7 +28,8 @@ DEFAULT_UNIT_TYPES = {
     "syringe": "syringes",
     "catheter": "catheters",
     "sheet": "sheets",
-    "custom": "items",
+    "custom_med": "items",
+    "custom_supply": "items",
 }
 
 PANEL_URL_PATH = "medication-stock-manager"

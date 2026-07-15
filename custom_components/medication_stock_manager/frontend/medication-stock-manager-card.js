@@ -1,7 +1,7 @@
 const MSM_ENTITY = "sensor.medication_stock_manager";
 const MSM_CARD_TAG = "medication-stock-manager-card";
 const MSM_PANEL_TAG = "ha-panel-medication-stock-manager";
-const MSM_CARD_VERSION = "1.4.2";
+const MSM_CARD_VERSION = "1.4.3";
 
 const MSM_DAYS = [
   ["mon", "Mon"],
@@ -23,7 +23,8 @@ const MSM_TYPES = {
   syringe: "syringes",
   catheter: "catheters",
   sheet: "sheets",
-  custom: "items",
+  custom_med: "items",
+  custom_supply: "items",
 };
 
 const MSM_SCHEDULES = [
@@ -56,7 +57,8 @@ const MSM_DEFAULT_FIELDS = [
 ];
 
 const MSM_DEFAULT_COLUMNS = ["name", "stock", "supply", "status"];
-const MSM_SUPPLY_TYPES = new Set(["syringe", "catheter", "sheet"]);
+const MSM_SUPPLY_TYPES = new Set(["syringe", "catheter", "sheet", "custom_supply"]);
+const MSM_CUSTOM_TYPES = new Set(["custom_med", "custom_supply"]);
 
 class MedicationStockManagerCard extends HTMLElement {
   constructor() {
@@ -644,6 +646,9 @@ class MedicationStockManagerCard extends HTMLElement {
   }
 
   _category(item) {
+    if (item.category === "supply" || item.category === "medication") {
+      return item.category;
+    }
     return MSM_SUPPLY_TYPES.has(item.item_type) ? "supply" : "medication";
   }
 
@@ -1465,8 +1470,16 @@ class MedicationStockManagerCard extends HTMLElement {
       this._bool("lock_owner", false) &&
       this._config.owner !== "all";
     const open = alwaysOpen || this._addItemOpen;
-    const defaultType = String(this._config.default_type || "capsule");
-    const defaultUnit = String(this._config.default_unit || MSM_TYPES[defaultType] || "items");
+    const configuredDefaultType = String(
+      this._config.default_type || "capsule"
+    );
+    const defaultType =
+      configuredDefaultType === "custom"
+        ? "custom_med"
+        : configuredDefaultType;
+    const defaultUnit = String(
+      this._config.default_unit || MSM_TYPES[defaultType] || "items"
+    );
     const defaultSchedule = String(this._config.default_schedule || "manual");
     const form = `
       <div class="editor" data-editor="new">
@@ -1603,7 +1616,7 @@ class MedicationStockManagerCard extends HTMLElement {
 
     this.shadowRoot.querySelectorAll('select[data-add="item_type"]').forEach((select) => {
       select.addEventListener("change", (event) => {
-        if (select.value === "custom") return;
+        if (MSM_CUSTOM_TYPES.has(select.value)) return;
         const editor = select.closest(".editor");
         const unit = editor?.querySelector('input[data-add="unit"]');
         if (unit) {
@@ -1615,7 +1628,7 @@ class MedicationStockManagerCard extends HTMLElement {
 
     this.shadowRoot.querySelectorAll('select[data-field="item_type"]').forEach((select) => {
       select.addEventListener("change", () => {
-        if (select.value === "custom") return;
+        if (MSM_CUSTOM_TYPES.has(select.value)) return;
         const editor = select.closest(".editor");
         const unit = editor?.querySelector('input[data-field="unit"]');
         if (unit) {
@@ -1852,7 +1865,7 @@ class MedicationStockManagerCard extends HTMLElement {
     const data = this._collectEditor(editor, "add");
     if (!String(data.name || "").trim()) throw new Error("Enter a name first.");
     this._validateSchedule(data);
-    if (data.item_type !== "custom" && (!data.unit || data.unit === "items")) {
+    if (!MSM_CUSTOM_TYPES.has(data.item_type) && (!data.unit || data.unit === "items")) {
       data.unit = MSM_TYPES[data.item_type] || "items";
     }
     await this._service("add_item", data);

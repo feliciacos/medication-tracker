@@ -30,4 +30,3 @@ MEDICATION_REENTRY*.md
 examples/personal_setup/
 examples/dashboards/felicia_*.yaml
 examples/dashboards/celine_*.yaml
-examples/dashboards/medication_stock_overview_view.yaml

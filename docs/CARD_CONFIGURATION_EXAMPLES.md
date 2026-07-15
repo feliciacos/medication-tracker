@@ -3,6 +3,12 @@
 The custom card is bundled and registered by Medication Stock Manager. No
 separate HACS frontend repository or `/local/...` resource is required.
 
+The optional owner-calendar example at
+`examples/dashboards/owner_medication_stock_bubble_card.yaml` also uses
+[Bubble Card](https://github.com/Clooos/Bubble-Card). It is the only separate
+HACS frontend card required by that example; it is not required for the bundled
+Medication Stock Manager card shown below.
+
 ## Interactive stock buttons
 
 ```yaml

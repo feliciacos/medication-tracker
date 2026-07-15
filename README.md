@@ -18,7 +18,8 @@ optional sidebar page.
 ## Features
 
 - Multiple owner profiles with optional Home Assistant Person association.
-- Medication and medical-supply items with custom units and icons.
+- Medication and medical-supply items with custom units, icons, and explicit
+  `custom_med` or `custom_supply` categories.
 - Manual, daily, selected-weekday, and every-X-days schedules.
 - Automatic stock deduction at configured times.
 - Configurable stock, warning threshold, package size, and usage values.
@@ -43,9 +44,11 @@ optional sidebar page.
 - HACS is optional but recommended for installation and updates.
 - JavaScript must be enabled in the browser for the bundled frontend card and
   sidebar panel.
-- The personalized dashboard examples may use third-party cards such as Bubble
-  Card; the integration and its generic setup page do not depend on those
-  examples.
+- [Bubble Card](https://github.com/Clooos/Bubble-Card) is the only third-party
+  HACS frontend card used by the optional owner-calendar dashboard example.
+  Install Bubble Card through HACS before importing that example. The core
+  integration, bundled Medication Stock Manager card, and generic setup page do
+  not require Bubble Card.
 
 ## HACS installation
 
@@ -111,7 +114,8 @@ After setup, use either the sidebar page or a normal dashboard card to:
 
 Useful card examples are available in
 [`docs/CARD_CONFIGURATION_EXAMPLES.md`](docs/CARD_CONFIGURATION_EXAMPLES.md).
-Example dashboard views are in [`examples/dashboards`](examples/dashboards).
+Example dashboard views are in [`examples/dashboards`](examples/dashboards),
+including a generic setup view and an optional Bubble Card owner-calendar view.
 
 No `configuration.yaml` entry is needed for normal operation.
 
@@ -238,12 +242,12 @@ hassfest. See [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md).
 ## Versioning and releases
 
 This repository uses semantic versioning. The first HACS-ready release was
-**1.4.0**. The current release is **1.4.2**.
+**1.4.0**. The current release is **1.4.3**.
 
 1. Commit and push the repository.
-2. Create and push the tag `v1.4.2`.
+2. Create and push the tag `v1.4.3`.
 3. Create a **published GitHub release** from that tag.
-4. Ensure `custom_components/medication_stock_manager/manifest.json` contains `1.4.2`.
+4. Ensure `custom_components/medication_stock_manager/manifest.json` contains `1.4.3`.
 5. Increment the version before every later release.
 
 HACS installs the integration directly from
@@ -255,13 +259,15 @@ HACS installs the integration directly from
 MIT License. See [`LICENSE`](LICENSE).
 
 
-## Validation status for 1.4.2
+## Validation status for 1.4.3
 
-The repository passes both HACS validation and Home Assistant hassfest on
-push and pull-request events. The hassfest compatibility fixes are:
+The repository includes local structure and syntax validation, plus GitHub
+Actions jobs for both HACS validation and Home Assistant hassfest on pushes and
+pull requests. Confirm both hosted jobs pass before publishing the release.
+The hassfest compatibility requirements include:
 
 - the `http` dependency in `manifest.json`;
 - `CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)` in
   `__init__.py`.
 
-The validation workflow pins `actions/checkout` v7.0.0 by commit SHA.
+The validation workflow pins `actions/checkout` v6.0.3 by commit SHA.
