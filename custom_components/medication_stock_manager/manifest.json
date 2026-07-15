@@ -1,26 +1,26 @@
 {
   "domain": "medication_stock_manager",
   "name": "Medication Stock Manager",
+  "version": "1.4.1",
+  "documentation": "https://github.com/feliciacos/medication-tracker",
+  "issue_tracker": "https://github.com/feliciacos/medication-tracker/issues",
   "codeowners": [
     "@feliciacos"
   ],
   "config_flow": true,
-  "dependencies": [
-    "button",
-    "calendar",
-    "frontend",
-    "http",
-    "lovelace",
-    "number",
-    "person",
-    "sensor",
-    "switch"
-  ],
-  "documentation": "https://github.com/feliciacos/medication-tracker",
+  "single_config_entry": true,
   "integration_type": "service",
   "iot_class": "local_push",
-  "issue_tracker": "https://github.com/feliciacos/medication-tracker/issues",
-  "requirements": [],
-  "single_config_entry": true,
-  "version": "1.4.0"
+  "dependencies": [
+    "frontend",
+    "sensor",
+    "number",
+    "switch",
+    "button",
+    "calendar",
+    "person",
+    "lovelace",
+    "http"
+  ],
+  "requirements": []
 }

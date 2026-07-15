@@ -5,6 +5,22 @@ All notable changes to this project are documented here. The project follows
 
 ## [Unreleased]
 
+## [1.4.1] - 2026-07-15
+
+### Fixed
+
+- Declared the integration as config-entry-only with
+  `CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)`, satisfying
+  Home Assistant hassfest without adding YAML configuration support.
+- Declared the Home Assistant `http` dependency used by the bundled frontend
+  static-file route.
+
+### Changed
+
+- Updated the pinned `actions/checkout` workflow dependency from v6.0.3 to
+  v7.0.0 through Dependabot PR #1.
+- Kept HACS and hassfest validation green for push and pull-request events.
+
 ## [1.4.0] - 2026-07-15
 
 ### Added
@@ -41,3 +57,5 @@ All notable changes to this project are documented here. The project follows
 - Frontend static URL and sidebar URL.
 
 [1.4.0]: https://github.com/feliciacos/medication-tracker/releases/tag/v1.4.0
+
+[1.4.1]: https://github.com/feliciacos/medication-tracker/releases/tag/v1.4.1

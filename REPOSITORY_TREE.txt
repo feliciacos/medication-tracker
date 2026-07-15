@@ -6,8 +6,10 @@
 ./.github/workflows/validate.yml
 ./.gitignore
 ./CHANGELOG.md
+./CURRENT_STATUS.md
 ./HACS_MIGRATION_REPORT.md
 ./LICENSE
+./NEXT_CHAT_CONTEXT.md
 ./PROJECT_CONTEXT.md
 ./README.md
 ./REPOSITORY_TREE.txt

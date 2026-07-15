@@ -49,3 +49,17 @@ installs the integration folder.
 
 `logo.png` and `logo@2x.png` currently reuse the existing icon artwork.
 Replace them later when final rectangular logo artwork is available.
+
+
+## Post-migration validation fixes
+
+The HACS repository now also includes the two declarations required by
+hassfest for the current runtime code:
+
+- `http` in the manifest dependency list because the integration registers a
+  static HTTP path;
+- `CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)` because the
+  integration implements `async_setup` but intentionally supports only UI
+  config entries, not `configuration.yaml`.
+
+Dependabot PR #1 updates the pinned checkout action to v7.0.0.

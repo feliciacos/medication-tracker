@@ -1,7 +1,7 @@
 const MSM_ENTITY = "sensor.medication_stock_manager";
 const MSM_CARD_TAG = "medication-stock-manager-card";
 const MSM_PANEL_TAG = "ha-panel-medication-stock-manager";
-const MSM_CARD_VERSION = "1.4.0";
+const MSM_CARD_VERSION = "1.4.1";
 
 const MSM_DAYS = [
   ["mon", "Mon"],

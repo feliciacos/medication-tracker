@@ -14,7 +14,7 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 DOMAIN = "medication_stock_manager"
-EXPECTED_VERSION = "1.4.0"
+EXPECTED_VERSION = "1.4.1"
 INTEGRATION = ROOT / "custom_components" / DOMAIN
 
 
@@ -33,6 +33,8 @@ if manifest.get("version") != EXPECTED_VERSION:
     fail("manifest version is not synchronized")
 if not manifest.get("documentation") or not manifest.get("issue_tracker"):
     fail("manifest documentation or issue tracker is missing")
+if "http" not in manifest.get("dependencies", []):
+    fail("manifest must declare the http dependency")
 
 const_text = (INTEGRATION / "const.py").read_text(encoding="utf-8")
 if f'VERSION = "{EXPECTED_VERSION}"' not in const_text:
@@ -42,6 +44,10 @@ frontend = INTEGRATION / "frontend/medication-stock-manager-card.js"
 frontend_text = frontend.read_text(encoding="utf-8")
 if f'MSM_CARD_VERSION = "{EXPECTED_VERSION}"' not in frontend_text:
     fail("frontend version is not synchronized")
+
+init_text = (INTEGRATION / "__init__.py").read_text(encoding="utf-8")
+if "CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)" not in init_text:
+    fail("config-entry-only CONFIG_SCHEMA declaration is missing")
 
 for path in INTEGRATION.rglob("*.py"):
     ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
