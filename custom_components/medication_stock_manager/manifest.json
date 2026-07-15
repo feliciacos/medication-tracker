@@ -19,7 +19,8 @@
     "button",
     "calendar",
     "person",
-    "lovelace"
+    "lovelace",
+    "http"
   ],
   "requirements": []
 }
