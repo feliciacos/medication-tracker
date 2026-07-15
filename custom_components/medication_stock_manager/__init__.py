@@ -1,6 +1,7 @@
 """Medication Stock Manager integration setup."""
 
 from __future__ import annotations
+from homeassistant.helpers import config_validation as cv
 
 from pathlib import Path
 import logging
@@ -52,6 +53,7 @@ from .const import (
     STORAGE_VERSION,
 )
 from .manager import MedicationStockManager
+CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 
 _LOGGER = logging.getLogger(__name__)
 
