@@ -38,6 +38,25 @@ optional sidebar page.
   removal cleanup.
 - No personal medication defaults in runtime code.
 
+## Screenshots / Custom Cards
+ - Add Medication / Supply Item
+<img width="1350" height="867" alt="chrome_dKthi4tIRw" src="https://github.com/user-attachments/assets/56f0a0bd-280d-4114-889c-d8611f17bfb8" />
+
+ - Medication / Item Configuration
+<img width="1352" height="728" alt="chrome_HJbjZpQCA1" src="https://github.com/user-attachments/assets/9f2245e6-a252-44ba-a674-e975deebda25" />
+<img width="1351" height="1071" alt="chrome_cOlCM7afCF" src="https://github.com/user-attachments/assets/a98eea0f-f462-406b-ada5-96c3d01f4649" />
+
+ - Add Owner
+<img width="1357" height="1125" alt="chrome_00hdtea1yg" src="https://github.com/user-attachments/assets/50d53845-ac2a-4800-8b33-c4ee6d06da85" />
+ 
+ - Update Medication / Supply Item Card
+<img width="573" height="989" alt="image" src="https://github.com/user-attachments/assets/17215f4e-6cc1-4904-b351-de6d8891d5d7" />
+<img width="740" height="677" alt="image" src="https://github.com/user-attachments/assets/1e60ca64-ea3d-4edc-9215-b409cf629514" />
+
+ - Medication Stock Overview Card 
+<img width="568" height="756" alt="image" src="https://github.com/user-attachments/assets/1938cf7e-4567-4472-9f37-90274ab08b83" />
+
+
 ## Requirements
 
 - Home Assistant **2026.3.0 or newer**.
