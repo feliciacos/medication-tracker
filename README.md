@@ -36,7 +36,6 @@ optional sidebar page.
 - Optional configurable Home Assistant sidebar panel.
 - UI config flow, options flow, config-entry migration, unload support, and
   removal cleanup.
-- No personal medication defaults in runtime code.
 
 ## Screenshots / Custom Cards
  - Add Medication / Supply Item
@@ -239,54 +238,6 @@ Remove it after troubleshooting to avoid excessive logs.
   dashboard cards that are not dependencies of this integration.
 - Removing the config entry deletes integration-owned stored data by design.
 
-## Development and validation
-
-The repository keeps every runtime dependency under:
-
-```text
-custom_components/medication_stock_manager/
-```
-
-Run local checks:
-
-```bash
-python -m compileall custom_components/medication_stock_manager
-node --check custom_components/medication_stock_manager/frontend/medication-stock-manager-card.js
-python scripts/validate_repository.py
-```
-
-GitHub Actions runs both the HACS repository validator and Home Assistant
-hassfest. See [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md).
-
-## Versioning and releases
-
-This repository uses semantic versioning. The first HACS-ready release was
-**1.4.0**. The current release is **1.4.3**.
-
-1. Commit and push the repository.
-2. Create and push the tag `v1.4.3`.
-3. Create a **published GitHub release** from that tag.
-4. Ensure `custom_components/medication_stock_manager/manifest.json` contains `1.4.3`.
-5. Increment the version before every later release.
-
-HACS installs the integration directly from
-`custom_components/medication_stock_manager/`; a separate release ZIP is not required. See
-[`docs/RELEASING.md`](docs/RELEASING.md).
-
 ## License
 
 MIT License. See [`LICENSE`](LICENSE).
-
-
-## Validation status for 1.4.3
-
-The repository includes local structure and syntax validation, plus GitHub
-Actions jobs for both HACS validation and Home Assistant hassfest on pushes and
-pull requests. Confirm both hosted jobs pass before publishing the release.
-The hassfest compatibility requirements include:
-
-- the `http` dependency in `manifest.json`;
-- `CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)` in
-  `__init__.py`.
-
-The validation workflow pins `actions/checkout` v6.0.3 by commit SHA.
