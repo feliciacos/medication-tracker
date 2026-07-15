@@ -1,0 +1,166 @@
+add_owner:
+  name: Add owner
+  description: Create an integration-owned medication owner profile.
+  fields:
+    name:
+      required: true
+      selector:
+        text: {}
+    owner_id:
+      selector:
+        text: {}
+    person_entity:
+      selector:
+        entity:
+          domain: person
+    auto_create_person:
+      selector:
+        boolean: {}
+    auto_detect_notify:
+      selector:
+        boolean: {}
+    reminder_notify_entities:
+      selector:
+        entity:
+          domain: notify
+          multiple: true
+    stock_notify_entities:
+      selector:
+        entity:
+          domain: notify
+          multiple: true
+    tracking_enabled:
+      selector:
+        boolean: {}
+    reminders_enabled:
+      selector:
+        boolean: {}
+    default_reminder_title:
+      selector:
+        text: {}
+    order_title:
+      selector:
+        text: {}
+    check_order_title:
+      selector:
+        text: {}
+update_owner:
+  name: Update owner
+  fields:
+    owner_id:
+      required: true
+      selector:
+        text: {}
+remove_owner:
+  name: Remove owner
+  fields:
+    owner_id:
+      required: true
+      selector:
+        text: {}
+clear_all_items:
+  name: Delete all items
+  description: Delete all medication/supply items. Owner profiles remain.
+restore_defaults:
+  name: Delete all items (legacy alias)
+  description: Legacy alias; no defaults are restored.
+add_item:
+  name: Add item
+  fields:
+    name:
+      required: true
+      selector:
+        text: {}
+    owner:
+      required: true
+      selector:
+        text: {}
+update_item:
+  name: Update item
+  fields:
+    item_id:
+      required: true
+      selector:
+        text: {}
+remove_item:
+  name: Remove item
+  fields:
+    item_id:
+      required: true
+      selector:
+        text: {}
+set_stock:
+  name: Set stock
+  fields:
+    item_id:
+      required: true
+      selector:
+        text: {}
+    value:
+      required: true
+      selector:
+        number:
+          min: 0
+          mode: box
+set_threshold:
+  name: Set warning threshold
+  fields:
+    item_id:
+      required: true
+      selector:
+        text: {}
+    value:
+      required: true
+      selector:
+        number:
+          min: 0
+          mode: box
+adjust_stock:
+  name: Adjust stock
+  fields:
+    item_id:
+      required: true
+      selector:
+        text: {}
+    amount:
+      required: true
+      selector:
+        number:
+          mode: box
+receive_box:
+  name: Receive box
+  fields:
+    item_id:
+      required: true
+      selector:
+        text: {}
+set_ordered:
+  name: Set ordered status
+  fields:
+    item_id:
+      required: true
+      selector:
+        text: {}
+    ordered:
+      required: true
+      selector:
+        boolean: {}
+process_now:
+  name: Process schedules now
+set_sidebar_options:
+  name: Set sidebar options
+  description: Enable, disable, or customize the integration-owned sidebar page.
+  fields:
+    show_sidebar_panel:
+      required: true
+      selector:
+        boolean: {}
+    sidebar_title:
+      selector:
+        text: {}
+    sidebar_icon:
+      selector:
+        icon: {}
+    sidebar_require_admin:
+      selector:
+        boolean: {}
