@@ -5,6 +5,18 @@ All notable changes to this project are documented here. The project follows
 
 ## [Unreleased]
 
+## [1.4.2] - 2026-07-15
+
+### Fixed
+
+- Reordered the sidebar settings grid so the title and icon text fields share
+  the top row and the two checkbox settings share the row below.
+
+### Privacy
+
+- Added private project-context and personalized example files to `.gitignore`
+  so they are not included in future public commits.
+
 ## [1.4.1] - 2026-07-15
 
 ### Fixed
@@ -59,3 +71,5 @@ All notable changes to this project are documented here. The project follows
 [1.4.0]: https://github.com/feliciacos/medication-tracker/releases/tag/v1.4.0
 
 [1.4.1]: https://github.com/feliciacos/medication-tracker/releases/tag/v1.4.1
+
+[1.4.2]: https://github.com/feliciacos/medication-tracker/releases/tag/v1.4.2

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 DOMAIN = "medication_stock_manager"
-VERSION = "1.4.1"
+VERSION = "1.4.2"
 PLATFORMS = ["sensor", "number", "switch", "button", "calendar"]
 
 STORAGE_KEY = f"{DOMAIN}.items"

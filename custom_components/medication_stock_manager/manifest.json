@@ -1,7 +1,7 @@
 {
   "domain": "medication_stock_manager",
   "name": "Medication Stock Manager",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "documentation": "https://github.com/feliciacos/medication-tracker",
   "issue_tracker": "https://github.com/feliciacos/medication-tracker/issues",
   "codeowners": [

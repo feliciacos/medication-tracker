@@ -1,7 +1,7 @@
 const MSM_ENTITY = "sensor.medication_stock_manager";
 const MSM_CARD_TAG = "medication-stock-manager-card";
 const MSM_PANEL_TAG = "ha-panel-medication-stock-manager";
-const MSM_CARD_VERSION = "1.4.1";
+const MSM_CARD_VERSION = "1.4.2";
 
 const MSM_DAYS = [
   ["mon", "Mon"],
@@ -1124,20 +1124,6 @@ class MedicationStockManagerCard extends HTMLElement {
     return `
       <section class="sidebar-settings">
         <div class="sidebar-settings-grid">
-          <label class="sidebar-toggle wide">
-            <input
-              type="checkbox"
-              data-sidebar-setting="show_sidebar_panel"
-              ${enabled ? "checked" : ""}
-            >
-            <span>
-              <strong>Show Medication Stock in the sidebar</strong>
-              <small>
-                This switch is also available under the integration device.
-              </small>
-            </span>
-          </label>
-
           <div class="field">
             <label>Sidebar title</label>
             <input
@@ -1159,7 +1145,21 @@ class MedicationStockManagerCard extends HTMLElement {
             >
           </div>
 
-          <label class="sidebar-toggle wide">
+          <label class="sidebar-toggle">
+            <input
+              type="checkbox"
+              data-sidebar-setting="show_sidebar_panel"
+              ${enabled ? "checked" : ""}
+            >
+            <span>
+              <strong>Show Medication Stock in the sidebar</strong>
+              <small>
+                This switch is also available under the integration device.
+              </small>
+            </span>
+          </label>
+
+          <label class="sidebar-toggle">
             <input
               type="checkbox"
               data-sidebar-setting="sidebar_require_admin"

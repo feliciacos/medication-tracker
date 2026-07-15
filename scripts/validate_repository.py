@@ -14,7 +14,7 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 DOMAIN = "medication_stock_manager"
-EXPECTED_VERSION = "1.4.1"
+EXPECTED_VERSION = "1.4.2"
 INTEGRATION = ROOT / "custom_components" / DOMAIN
 
 

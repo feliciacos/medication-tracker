@@ -238,12 +238,12 @@ hassfest. See [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md).
 ## Versioning and releases
 
 This repository uses semantic versioning. The first HACS-ready release was
-**1.4.0**. The current release is **1.4.1**.
+**1.4.0**. The current release is **1.4.2**.
 
 1. Commit and push the repository.
-2. Create and push the tag `v1.4.1`.
+2. Create and push the tag `v1.4.2`.
 3. Create a **published GitHub release** from that tag.
-4. Ensure `custom_components/medication_stock_manager/manifest.json` contains `1.4.1`.
+4. Ensure `custom_components/medication_stock_manager/manifest.json` contains `1.4.2`.
 5. Increment the version before every later release.
 
 HACS installs the integration directly from
@@ -255,7 +255,7 @@ HACS installs the integration directly from
 MIT License. See [`LICENSE`](LICENSE).
 
 
-## Validation status for 1.4.1
+## Validation status for 1.4.2
 
 The repository passes both HACS validation and Home Assistant hassfest on
 push and pull-request events. The hassfest compatibility fixes are:

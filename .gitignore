@@ -13,3 +13,21 @@ htmlcov/
 dist/
 build/
 *.egg-info/
+
+# Private project context / AI handoff notes
+PROJECT_CONTEXT*.md
+NEXT_CHAT_CONTEXT*.md
+CURRENT_STATUS*.md
+PRIVACY_REVIEW*.md
+MEDICATION_REENTRY*.md
+**/PROJECT_CONTEXT*.md
+**/NEXT_CHAT_CONTEXT*.md
+**/CURRENT_STATUS*.md
+**/*_CONTEXT*.md
+**/*_context*.md
+
+# Personalized medication examples
+examples/personal_setup/
+examples/dashboards/felicia_*.yaml
+examples/dashboards/celine_*.yaml
+examples/dashboards/medication_stock_overview_view.yaml

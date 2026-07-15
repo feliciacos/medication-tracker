@@ -1,7 +1,7 @@
 # Releasing Medication Stock Manager
 
 The project uses semantic versioning. The first HACS-ready release was
-`1.4.1`. The current release is `1.4.1` and the Git tag is `v1.4.1`.
+`1.4.2`. The current release is `1.4.2` and the Git tag is `v1.4.2`.
 
 ## Before a release
 
@@ -15,10 +15,10 @@ The project uses semantic versioning. The first HACS-ready release was
 ## Publish the release
 
 ```bash
-git tag -a v1.4.1 -m "Medication Stock Manager v1.4.1"
-git push origin v1.4.1
-gh release create v1.4.1 \
-  --title "Medication Stock Manager v1.4.1" \
+git tag -a v1.4.2 -m "Medication Stock Manager v1.4.2"
+git push origin v1.4.2
+gh release create v1.4.2 \
+  --title "Medication Stock Manager v1.4.2" \
   --notes "See CHANGELOG.md for the full release notes."
 ```
 
