@@ -1,0 +1,42 @@
+type: masonry
+path: medication-stock
+title: Medication Stock
+icon: mdi:medical-bag
+badges: []
+cards:
+- type: custom:medication-stock-manager-card
+  view: sidebar_settings
+  title: Sidebar Settings
+- type: custom:medication-stock-manager-card
+  view: create_owner
+  title: Owners
+  show_existing_owners: true
+- type: custom:medication-stock-manager-card
+  view: create_item
+  owner: all
+  title: New Medication / Item
+  default_type: capsule
+  default_schedule: manual
+- type: custom:medication-stock-manager-card
+  view: stock_buttons
+  owner: all
+  title: Medication & Supplies
+  group_by_owner: true
+- type: custom:medication-stock-manager-card
+  view: stock_table
+  owner: all
+  title: Medication & Supply Stock
+  columns:
+  - name
+  - owner
+  - stock
+  - supply
+  - status
+  horizontal_scroll: false
+- type: custom:medication-stock-manager-card
+  view: item_configuration
+  owner: all
+  title: Medication & Item Configuration
+  show_restore_defaults: true
+  show_remove: true
+  show_actions: true

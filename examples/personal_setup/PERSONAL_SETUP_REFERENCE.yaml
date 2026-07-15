@@ -1,0 +1,364 @@
+note: Reference only. Not loaded automatically. Owner/item values may be re-entered through the integration UI; all runtime
+  entities are created by the integration.
+owners:
+- id: felicia
+  name: Felicia
+  reminder_notify_entities:
+  - notify.red_magic_9_pro
+  stock_notify_entities:
+  - notify.red_magic_9_pro
+  default_reminder_title: Take your medication
+  order_title: Medication stock warning
+  check_order_title: Medication stock warning
+  tracking_enabled: true
+  reminders_enabled: true
+- id: celine
+  name: Celine
+  reminder_notify_entities:
+  - notify.sm_a556b
+  stock_notify_entities:
+  - notify.red_magic_9_pro
+  - notify.sm_a556b
+  default_reminder_title: Neem Medicatie In
+  order_title: Bestel Medicatie
+  check_order_title: Controleer Bestelling Medicatie
+  tracking_enabled: true
+  reminders_enabled: true
+items:
+- id: felicia_estradiol_100
+  owner: felicia
+  name: Estradiol SDZ 100 µg/24 uur
+  item_type: plaster
+  unit: plasters
+  icon: mdi:bandage
+  package_size: 8
+  threshold: 8
+  usage_per_day: 1
+  schedule_mode: weekly
+  days:
+  - thu
+  - sun
+  times:
+  - '11:00'
+  interval_days: 1
+  start_date: '2026-07-15'
+  reminder_enabled: false
+  reminder_title: Take your medication
+  reminder_message: Estradiol SDZ 100 µg/24 uur
+  product_url: ''
+  built_in: true
+  enabled: true
+  deleted: false
+- id: felicia_estradiol_50
+  owner: felicia
+  name: Estradiol SDZ 50 µg/24 uur
+  item_type: plaster
+  unit: plasters
+  icon: mdi:bandage
+  package_size: 8
+  threshold: 8
+  usage_per_day: 1
+  schedule_mode: weekly
+  days:
+  - thu
+  - sun
+  times:
+  - '11:00'
+  interval_days: 1
+  start_date: '2026-07-15'
+  reminder_enabled: false
+  reminder_title: Take your medication
+  reminder_message: Estradiol SDZ 50 µg/24 uur
+  product_url: ''
+  built_in: true
+  enabled: true
+  deleted: false
+- id: felicia_utrogestan
+  owner: felicia
+  name: Utrogestan Progesteron 100 mg
+  item_type: capsule
+  unit: capsules
+  icon: mdi:pill
+  package_size: 30
+  threshold: 30
+  usage_per_day: 2
+  schedule_mode: weekly
+  days:
+  - mon
+  - tue
+  - wed
+  - thu
+  - fri
+  - sat
+  - sun
+  times:
+  - '21:00'
+  interval_days: 1
+  start_date: '2026-07-15'
+  reminder_enabled: false
+  reminder_title: Take your medication
+  reminder_message: Utrogestan Progesteron 100 mg
+  product_url: ''
+  built_in: true
+  enabled: true
+  deleted: false
+- id: felicia_bd_syringe
+  owner: felicia
+  name: BD Plastipak Catheter Tip Syringe 50 ml
+  item_type: syringe
+  unit: syringes
+  icon: mdi:needle
+  package_size: 60
+  threshold: 3
+  usage_per_day: 0
+  schedule_mode: manual
+  days:
+  - mon
+  - tue
+  - wed
+  - thu
+  - fri
+  - sat
+  - sun
+  times: []
+  interval_days: 1
+  start_date: '2026-07-15'
+  reminder_enabled: false
+  reminder_title: ''
+  reminder_message: ''
+  product_url: https://www.medischevakhandel.nl/nl/bd-plastipak-injectiespuiten-50ml-3-delig-katheter-tip-60-stuks
+  built_in: true
+  enabled: true
+  deleted: false
+- id: felicia_dct_catheter
+  owner: felicia
+  name: DCT Nelaton-Katheter for women CH12
+  item_type: catheter
+  unit: catheters
+  icon: mdi:medical-bag
+  package_size: 50
+  threshold: 3
+  usage_per_day: 0
+  schedule_mode: manual
+  days:
+  - mon
+  - tue
+  - wed
+  - thu
+  - fri
+  - sat
+  - sun
+  times: []
+  interval_days: 1
+  start_date: '2026-07-15'
+  reminder_enabled: false
+  reminder_title: ''
+  reminder_message: ''
+  product_url: https://www.medischevakhandel.nl/nl/dct-vrouwenkatheter-keuze-uit-5-maten-50-stuks-ch12
+  built_in: true
+  enabled: true
+  deleted: false
+- id: felicia_gynotex_sheets
+  owner: felicia
+  name: Gynotex Premium Incontinence Sheets
+  item_type: sheet
+  unit: sheets
+  icon: mdi:bed-outline
+  package_size: 25
+  threshold: 25
+  usage_per_day: 2
+  schedule_mode: weekly
+  days:
+  - mon
+  - tue
+  - wed
+  - thu
+  - fri
+  - sat
+  - sun
+  times:
+  - 08:00
+  - '20:00'
+  interval_days: 1
+  start_date: '2026-07-15'
+  reminder_enabled: true
+  reminder_title: Dillateren 30m
+  reminder_message: Gynotex Premium Incontinence Sheets
+  product_url: https://www.bol.com/nl/nl/p/gynotex-premium-incontinentie-bed-onderleggers-wegwerp-incontinentie-onderleggers-matrasbeschermers-60-x-90-cm-tot-1400-ml-absorptie-25-stuks/9300000233154156/
+  built_in: true
+  enabled: true
+  deleted: false
+- id: celine_omeprazol
+  owner: celine
+  name: Omeprazol 1A 40mg
+  item_type: capsule
+  unit: capsules
+  icon: mdi:pill
+  package_size: 100
+  threshold: 20
+  usage_per_day: 1
+  schedule_mode: weekly
+  days:
+  - mon
+  - tue
+  - wed
+  - thu
+  - fri
+  - sat
+  - sun
+  times:
+  - 08:00
+  interval_days: 1
+  start_date: '2026-07-15'
+  reminder_enabled: false
+  reminder_title: Neem Medicatie In
+  reminder_message: Omeprazol 1A 40mg
+  product_url: ''
+  built_in: true
+  enabled: true
+  deleted: false
+- id: celine_mebeverine
+  owner: celine
+  name: Mebeverine HCl Retard 200mg
+  item_type: capsule
+  unit: capsules
+  icon: mdi:pill
+  package_size: 60
+  threshold: 12
+  usage_per_day: 2
+  schedule_mode: weekly
+  days:
+  - mon
+  - tue
+  - wed
+  - thu
+  - fri
+  - sat
+  - sun
+  times:
+  - 08:00
+  - '20:00'
+  interval_days: 1
+  start_date: '2026-07-15'
+  reminder_enabled: false
+  reminder_title: Neem Medicatie In
+  reminder_message: Mebeverine HCl Retard 200mg
+  product_url: ''
+  built_in: true
+  enabled: true
+  deleted: false
+- id: celine_magnesium
+  owner: celine
+  name: MagnesiumHydroxide 724mg
+  item_type: chewable_tablet
+  unit: chewable tablets
+  icon: mdi:pill
+  package_size: 100
+  threshold: 20
+  usage_per_day: 1
+  schedule_mode: weekly
+  days:
+  - mon
+  - tue
+  - wed
+  - thu
+  - fri
+  - sat
+  - sun
+  times:
+  - 08:00
+  interval_days: 1
+  start_date: '2026-07-15'
+  reminder_enabled: false
+  reminder_title: Neem Medicatie In
+  reminder_message: MagnesiumHydroxide 724mg
+  product_url: ''
+  built_in: true
+  enabled: true
+  deleted: false
+- id: celine_loratadine
+  owner: celine
+  name: Loratadine Hooikoortspillen 10mg
+  item_type: tablet
+  unit: tablets
+  icon: mdi:pill
+  package_size: 30
+  threshold: 6
+  usage_per_day: 1
+  schedule_mode: weekly
+  days:
+  - mon
+  - tue
+  - wed
+  - thu
+  - fri
+  - sat
+  - sun
+  times:
+  - 08:00
+  interval_days: 1
+  start_date: '2026-07-15'
+  reminder_enabled: false
+  reminder_title: Neem Medicatie In
+  reminder_message: Loratadine Hooikoortspillen 10mg
+  product_url: ''
+  built_in: true
+  enabled: true
+  deleted: false
+- id: celine_buscopan
+  owner: celine
+  name: Buscopan 10mg
+  item_type: tablet
+  unit: tablets
+  icon: mdi:pill
+  package_size: 100
+  threshold: 20
+  usage_per_day: 0
+  schedule_mode: manual
+  days:
+  - mon
+  - tue
+  - wed
+  - thu
+  - fri
+  - sat
+  - sun
+  times: []
+  interval_days: 1
+  start_date: '2026-07-15'
+  reminder_enabled: false
+  reminder_title: ''
+  reminder_message: ''
+  product_url: ''
+  built_in: true
+  enabled: true
+  deleted: false
+- id: celine_molaxole
+  owner: celine
+  name: Macrogol / Molaxole 13.7–13.8g
+  item_type: sachet
+  unit: sachets
+  icon: mdi:cup-water
+  package_size: 30
+  threshold: 6
+  usage_per_day: 1
+  schedule_mode: interval
+  days:
+  - mon
+  - tue
+  - wed
+  - thu
+  - fri
+  - sat
+  - sun
+  times:
+  - 08:00
+  interval_days: 3
+  start_date: '2026-07-13'
+  reminder_enabled: false
+  reminder_title: Neem Medicatie In
+  reminder_message: Macrogol / Molaxole 13.7–13.8g
+  product_url: ''
+  built_in: true
+  enabled: true
+  deleted: false
