@@ -53,6 +53,10 @@
     "move_item": {
       "name": "Move item",
       "description": "Move an item up or down within its owner and medication/supply category."
+    },
+    "reorder_item": {
+      "name": "Reorder item",
+      "description": "Place an item before or after another item within the same owner and medication/supply category."
     }
   }
 }

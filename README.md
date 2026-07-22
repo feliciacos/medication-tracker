@@ -131,8 +131,8 @@ After setup, use either the sidebar page or a normal dashboard card to:
 1. Create or edit owners.
 2. Create medication or medical-supply items.
 3. Configure schedules, stock values, reminders, warning thresholds, and icons.
-4. Reorder items with the arrow controls inside their Medication or Supplies
-   section. Items cannot cross owner or category boundaries.
+4. Drag items by their handle inside the Medication or Supplies section.
+   Items cannot cross owner or category boundaries.
 5. Use the stock buttons to receive a box, mark an order, or adjust stock.
 
 Useful card examples are available in
@@ -265,10 +265,10 @@ hassfest. See [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md).
 ## Versioning and releases
 
 This repository uses semantic versioning. The current prepared release is
-**1.5.0**.
+**1.5.1**.
 
 1. Commit and push the repository.
-2. Create and push the tag `v1.5.0`.
+2. Create and push the tag `v1.5.1`.
 3. Create a published GitHub release from that tag.
 4. Keep the manifest, Python constant, frontend constant, changelog, tag, and
    release synchronized.

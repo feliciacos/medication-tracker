@@ -125,12 +125,26 @@ def main() -> int:
     if "config_entry_only_config_schema(DOMAIN)" not in init_text:
         fail("config-entry-only CONFIG_SCHEMA is missing")
     if '("move_item", move_item, MOVE_ITEM_SCHEMA)' not in init_text:
-        fail("move_item service registration is missing")
-    if "async def async_move_item" not in (
-        INTEGRATION / "manager.py"
-    ).read_text(encoding="utf-8"):
-        fail("manager async_move_item implementation is missing")
-    for marker in ("ha-icon-picker", "Medication", "Supplies", "move-item"):
+        fail("move_item compatibility service registration is missing")
+    if '("reorder_item", reorder_item, REORDER_ITEM_SCHEMA)' not in init_text:
+        fail("reorder_item drag service registration is missing")
+    manager_text = (INTEGRATION / "manager.py").read_text(encoding="utf-8")
+    if "async def async_move_item" not in manager_text:
+        fail("manager async_move_item compatibility implementation is missing")
+    if "async def async_reorder_item" not in manager_text:
+        fail("manager async_reorder_item implementation is missing")
+    for marker in (
+        "ha-icon-picker",
+        "msmLoadHaIconPicker",
+        "msm-icon-picker-fallback",
+        "configuration-category-heading",
+        "stock-button-heading",
+        "drag-handle",
+        'handle.addEventListener("pointerdown"',
+        "_dragTargetAtPoint",
+        'this._service("reorder_item"',
+        "msmRefreshExistingFrontendInstances",
+    ):
         if marker not in frontend_text:
             fail(f"Frontend feature marker missing: {marker}")
 

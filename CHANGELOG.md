@@ -5,6 +5,30 @@ All notable changes to this project are documented here. The project follows
 
 ## [Unreleased]
 
+## [1.5.1] - 2026-07-22
+
+### Fixed
+
+- Replaced the first up/down-button implementation with actual pointer-based
+  drag-and-drop item ordering in Medication & Item Configuration, including
+  mouse, pen, and touch input.
+- Added a category-safe `reorder_item` service that persists a dropped item
+  before or after its target and rejects cross-owner or cross-category moves.
+- Explicitly preloads Home Assistant's native `ha-icon-picker` before rendering
+  icon controls and retains a searchable text autocomplete fallback.
+- Forces existing custom-card and sidebar-panel instances to rebuild after a
+  frontend hot upgrade, preventing an already-rendered older DOM from hiding
+  new controls and category separators.
+- Always renders Medication and Supplies separators in both configuration and
+  stock-button category views.
+
+### Preserved
+
+- Keyboard reordering remains available with Arrow Up and Arrow Down on the drag
+  handle through the existing `move_item` service.
+- Domain, storage key, config entry, migrations, unique IDs, existing services,
+  frontend route, sidebar route, and item data remain compatible.
+
 ## [1.5.0] - 2026-07-22
 
 ### Added
@@ -108,3 +132,5 @@ All notable changes to this project are documented here. The project follows
 [1.4.2]: https://github.com/feliciacos/medication-tracker/releases/tag/v1.4.2
 [1.4.3]: https://github.com/feliciacos/medication-tracker/releases/tag/v1.4.3
 [1.5.0]: https://github.com/feliciacos/medication-tracker/releases/tag/v1.5.0
+
+[1.5.1]: https://github.com/feliciacos/medication-tracker/releases/tag/v1.5.1

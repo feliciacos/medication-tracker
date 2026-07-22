@@ -131,6 +131,13 @@ MOVE_ITEM_SCHEMA = vol.Schema(
         vol.Required("direction"): vol.In(("up", "down")),
     }
 )
+REORDER_ITEM_SCHEMA = vol.Schema(
+    {
+        vol.Required("item_id"): cv.string,
+        vol.Required("target_item_id"): cv.string,
+        vol.Required("position"): vol.In(("before", "after")),
+    }
+)
 SIDEBAR_OPTIONS_SCHEMA = vol.Schema(
     {
         vol.Required("show_sidebar_panel"): cv.boolean,
@@ -545,6 +552,15 @@ def _register_services(hass: HomeAssistant) -> None:
             call.data["direction"],
         )
 
+    async def reorder_item(call: ServiceCall) -> None:
+        await invoke(
+            "async_reorder_item",
+            call,
+            call.data["item_id"],
+            call.data["target_item_id"],
+            call.data["position"],
+        )
+
     async def remove_item(call: ServiceCall) -> None:
         await invoke("async_remove_item", call, call.data["item_id"])
 
@@ -619,6 +635,7 @@ def _register_services(hass: HomeAssistant) -> None:
         ("add_item", add_item, ADD_ITEM_SCHEMA),
         ("update_item", update_item, UPDATE_ITEM_SCHEMA),
         ("move_item", move_item, MOVE_ITEM_SCHEMA),
+        ("reorder_item", reorder_item, REORDER_ITEM_SCHEMA),
         ("remove_item", remove_item, ITEM_SCHEMA),
         ("set_stock", set_stock, VALUE_SCHEMA),
         ("set_threshold", set_threshold, VALUE_SCHEMA),

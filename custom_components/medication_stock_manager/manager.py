@@ -815,6 +815,70 @@ class MedicationStockManager:
         await self.async_save()
         self.async_notify_listeners()
 
+    async def async_reorder_item(
+        self,
+        item_id: str,
+        target_item_id: str,
+        position: str,
+    ) -> None:
+        """Place an item before or after a compatible drag target."""
+        item = self._require_item(item_id)
+        target = self._require_item(target_item_id)
+        normalized_position = str(position).strip().lower()
+        if normalized_position not in {"before", "after"}:
+            raise ValueError("Position must be before or after")
+        if item["id"] == target["id"]:
+            return
+
+        owner = str(item.get("owner", ""))
+        category = self._item_category(
+            str(item.get("item_type", "custom_med"))
+        )
+        target_owner = str(target.get("owner", ""))
+        target_category = self._item_category(
+            str(target.get("item_type", "custom_med"))
+        )
+        if target_owner != owner or target_category != category:
+            raise ValueError(
+                "Items can only be reordered within the same owner and "
+                "Medication or Supplies category"
+            )
+
+        siblings = sorted(
+            (
+                candidate
+                for candidate in self.items.values()
+                if candidate.get("owner") == owner
+                and self._item_category(
+                    str(candidate.get("item_type", "custom_med"))
+                )
+                == category
+            ),
+            key=lambda candidate: (
+                int(candidate.get("display_order", 1000)),
+                str(candidate.get("name", "")).lower(),
+                str(candidate.get("id", "")),
+            ),
+        )
+        moving = next(
+            candidate for candidate in siblings if candidate["id"] == item["id"]
+        )
+        siblings.remove(moving)
+        target_index = next(
+            index
+            for index, candidate in enumerate(siblings)
+            if candidate["id"] == target["id"]
+        )
+        insert_index = target_index + (
+            1 if normalized_position == "after" else 0
+        )
+        siblings.insert(insert_index, moving)
+
+        for index, candidate in enumerate(siblings, start=1):
+            candidate["display_order"] = index * 10
+        await self.async_save()
+        self.async_notify_listeners()
+
     async def async_remove_item(self, item_id: str) -> None:
         item = self._require_item(item_id)
         self.items.pop(item["id"], None)

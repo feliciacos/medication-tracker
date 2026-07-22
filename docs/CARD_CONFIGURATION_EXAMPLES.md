@@ -57,9 +57,11 @@ show_actions: true
 ```
 
 The card automatically renders separate `Medication` and `Supplies` sections.
-Each item has up/down arrow controls. Reordering is persisted by the integration
-and is limited to items with the same owner in the same section, so medication
-cannot be moved into Supplies and supplies cannot be moved into Medication.
+Each item has a drag handle. Drag an item above or below another item with
+the same owner in the same section. The backend persists the before/after
+position and rejects cross-owner or cross-category drops, so medication cannot
+be moved into Supplies and supplies cannot be moved into Medication. The handle
+also supports Arrow Up and Arrow Down when focused.
 
 The red delete-all action permanently removes all items and their generated
 calendar events while retaining owner profiles.

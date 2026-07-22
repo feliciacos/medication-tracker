@@ -97,6 +97,25 @@ move_item:
           options:
             - up
             - down
+reorder_item:
+  name: Reorder item
+  description: Place an item before or after another item within the same owner and medication/supply category.
+  fields:
+    item_id:
+      required: true
+      selector:
+        text: {}
+    target_item_id:
+      required: true
+      selector:
+        text: {}
+    position:
+      required: true
+      selector:
+        select:
+          options:
+            - before
+            - after
 remove_item:
   name: Remove item
   fields:
