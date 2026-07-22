@@ -1,7 +1,7 @@
 const MSM_ENTITY = "sensor.medication_stock_manager";
 const MSM_CARD_TAG = "medication-stock-manager-card";
 const MSM_PANEL_TAG = "ha-panel-medication-stock-manager";
-const MSM_CARD_VERSION = "1.5.1";
+const MSM_CARD_VERSION = "1.5.2";
 
 const MSM_DAYS = [
   ["mon", "Mon"],
@@ -245,6 +245,8 @@ class MedicationStockManagerCard extends HTMLElement {
     this._optimisticStock = new Map();
     this._optimisticOrdered = new Map();
     this._dragState = null;
+    this._viewportScrollLock = null;
+    this._viewportScrollLockTimer = null;
     this._iconPickerReady = Boolean(
       customElements.get("ha-icon-picker")
     );
@@ -557,9 +559,37 @@ class MedicationStockManagerCard extends HTMLElement {
     });
   }
 
+  _beginViewportScrollLock() {
+    const lock = {
+      id: `${Date.now()}-${Math.random()}`,
+      positions: this._captureViewportScroll(),
+    };
+    this._viewportScrollLock = lock;
+    if (this._viewportScrollLockTimer) {
+      window.clearTimeout(this._viewportScrollLockTimer);
+      this._viewportScrollLockTimer = null;
+    }
+    return lock;
+  }
+
+  _finishViewportScrollLock(lock, delay = 1400) {
+    if (!lock || this._viewportScrollLock?.id !== lock.id) return;
+    this._restoreViewportScroll(lock.positions);
+    if (this._viewportScrollLockTimer) {
+      window.clearTimeout(this._viewportScrollLockTimer);
+    }
+    this._viewportScrollLockTimer = window.setTimeout(() => {
+      if (this._viewportScrollLock?.id !== lock.id) return;
+      this._restoreViewportScroll(lock.positions);
+      this._viewportScrollLock = null;
+      this._viewportScrollLockTimer = null;
+    }, delay);
+  }
+
   _render() {
     if (!this.shadowRoot) return;
-    const viewportScroll = this._captureViewportScroll();
+    const viewportScroll =
+      this._viewportScrollLock?.positions || this._captureViewportScroll();
     this._captureUiState();
 
     if (!this._hass) {
@@ -2057,6 +2087,10 @@ class MedicationStockManagerCard extends HTMLElement {
           position: state.position,
           active: state.active,
         };
+        const viewportLock =
+          request.active && request.targetId && request.position
+            ? this._beginViewportScrollLock()
+            : null;
         this._clearItemDragState();
         if (
           cancelled ||
@@ -2080,6 +2114,8 @@ class MedicationStockManagerCard extends HTMLElement {
             error?.message || "The reorder failed.",
             "error"
           );
+        } finally {
+          this._finishViewportScrollLock(viewportLock);
         }
       };
 
@@ -2625,8 +2661,8 @@ class MedicationStockManagerCard extends HTMLElement {
         z-index: 2;
         pointer-events: none;
       }
-      details.item.drop-before::before { top: -7px; }
-      details.item.drop-after::after { bottom: -7px; }
+      details.item.drop-before::before { top: 0; }
+      details.item.drop-after::after { bottom: 0; }
       .status-dot { width: 11px; height: 11px; border-radius: 50%; flex: 0 0 11px; }
       .status-dot.ok { background: var(--success-color, #43a047); }
       .status-dot.low { background: var(--error-color); }
@@ -3419,6 +3455,39 @@ function msmWalkOpenShadowRoots(root, callback) {
   });
 }
 
+function msmRepairMissingLovelaceCards() {
+  if (!customElements.get(MSM_CARD_TAG)) return;
+  msmWalkOpenShadowRoots(document, (root) => {
+    root.querySelectorAll("hui-error-card").forEach((errorCard) => {
+      const message = `${errorCard.textContent || ""} ${
+        errorCard.shadowRoot?.textContent || ""
+      }`;
+      if (
+        !message.includes(
+          `Custom element doesn't exist: ${MSM_CARD_TAG}`
+        )
+      ) {
+        return;
+      }
+      errorCard.dispatchEvent(
+        new CustomEvent("ll-rebuild", {
+          bubbles: true,
+          composed: true,
+        })
+      );
+    });
+  });
+}
+
+function msmScheduleLovelaceCardRepair() {
+  const repair = () => msmRepairMissingLovelaceCards();
+  repair();
+  requestAnimationFrame(repair);
+  window.setTimeout(repair, 250);
+  window.setTimeout(repair, 1000);
+  window.setTimeout(repair, 2500);
+}
+
 function msmRefreshExistingFrontendInstances() {
   requestAnimationFrame(() => {
     msmWalkOpenShadowRoots(document, (root) => {
@@ -3447,8 +3516,15 @@ function msmRefreshExistingFrontendInstances() {
 }
 
 msmRefreshExistingFrontendInstances();
+msmScheduleLovelaceCardRepair();
+customElements.whenDefined(MSM_CARD_TAG).then(() => {
+  msmScheduleLovelaceCardRepair();
+});
 msmLoadHaIconPicker().then((loaded) => {
-  if (loaded) msmRefreshExistingFrontendInstances();
+  if (loaded) {
+    msmRefreshExistingFrontendInstances();
+    msmScheduleLovelaceCardRepair();
+  }
 });
 
 window.customCards = window.customCards || [];

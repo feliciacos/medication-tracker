@@ -193,6 +193,9 @@ Then restart Home Assistant and inspect **Settings -> System -> Logs**.
 
 ### Custom element does not exist
 
+Version 1.5.2 automatically asks Home Assistant to rebuild temporary matching
+error cards after the bundled custom element registers. If an old error remains:
+
 - Confirm the integration finished loading.
 - Fully close and reopen the browser tab.
 - Clear the site cache if an old frontend version remains loaded.
@@ -265,10 +268,10 @@ hassfest. See [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md).
 ## Versioning and releases
 
 This repository uses semantic versioning. The current prepared release is
-**1.5.1**.
+**1.5.2**.
 
 1. Commit and push the repository.
-2. Create and push the tag `v1.5.1`.
+2. Create and push the tag `v1.5.2`.
 3. Create a published GitHub release from that tag.
 4. Keep the manifest, Python constant, frontend constant, changelog, tag, and
    release synchronized.

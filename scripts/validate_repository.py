@@ -144,6 +144,12 @@ def main() -> int:
         "_dragTargetAtPoint",
         'this._service("reorder_item"',
         "msmRefreshExistingFrontendInstances",
+        "_beginViewportScrollLock",
+        "_finishViewportScrollLock",
+        "msmRepairMissingLovelaceCards",
+        'new CustomEvent("ll-rebuild"',
+        "details.item.drop-before::before { top: 0; }",
+        "details.item.drop-after::after { bottom: 0; }",
     ):
         if marker not in frontend_text:
             fail(f"Frontend feature marker missing: {marker}")
@@ -159,6 +165,10 @@ def main() -> int:
                 "--check",
                 str(INTEGRATION / "frontend/medication-stock-manager-card.js"),
             ],
+            check=True,
+        )
+        subprocess.run(
+            [node, str(ROOT / "scripts/test_frontend_registration.js")],
             check=True,
         )
     else:

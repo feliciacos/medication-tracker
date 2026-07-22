@@ -5,6 +5,27 @@ All notable changes to this project are documented here. The project follows
 
 ## [Unreleased]
 
+## [1.5.2] - 2026-07-22
+
+### Fixed
+
+- Made the drag destination line visible inside the target item so rounded-card
+  overflow no longer clips it.
+- Preserved the current dashboard/sidebar scroll position across the complete
+  reorder service cycle, including consecutive manager-state and success-message
+  renders.
+- Added recovery for Home Assistant's intermittent custom-card loading race by
+  finding connected `hui-error-card` instances for
+  `medication-stock-manager-card` and requesting their normal `ll-rebuild`
+  replacement after registration.
+
+### Preserved
+
+- Dragging remains limited to the same owner and Medication/Supplies category,
+  with the boundary enforced by the backend service.
+- Existing entity IDs, unique IDs, storage, services, frontend route, sidebar
+  route, and item data remain compatible.
+
 ## [1.5.1] - 2026-07-22
 
 ### Fixed
@@ -134,3 +155,5 @@ All notable changes to this project are documented here. The project follows
 [1.5.0]: https://github.com/feliciacos/medication-tracker/releases/tag/v1.5.0
 
 [1.5.1]: https://github.com/feliciacos/medication-tracker/releases/tag/v1.5.1
+
+[1.5.2]: https://github.com/feliciacos/medication-tracker/releases/tag/v1.5.2

@@ -3,7 +3,7 @@
 ## Confirm the integration version
 
 Open **Settings -> Devices & services -> Medication Stock Manager**. The
-service and owner devices should report software version `1.5.1`.
+service and owner devices should report software version `1.5.2`.
 
 ## Confirm the JavaScript file is served
 
@@ -11,7 +11,7 @@ Run this in the browser developer console:
 
 ```javascript
 fetch(
-  "/medication-stock-manager/medication-stock-manager-card.js?v=1.5.1"
+  "/medication-stock-manager/medication-stock-manager-card.js?v=1.5.2"
 ).then(async (response) => ({
   status: response.status,
   contentType: response.headers.get("content-type"),
@@ -25,7 +25,7 @@ Expected result:
 
 ```text
 status: 200
-version: 1.5.1
+version: 1.5.2
 ```
 
 ## Confirm the custom card is registered
@@ -39,7 +39,7 @@ customElements.get(
 Expected result:
 
 ```text
-1.5.1
+1.5.2
 ```
 
 ## Confirm the sidebar panel is registered
