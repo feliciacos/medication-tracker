@@ -4,7 +4,7 @@
     "step": {
       "user": {
         "title": "Medication Stock Manager",
-        "description": "Set up a self-contained medication and medical-supply manager. You can optionally create its integration-owned configuration page in the Home Assistant sidebar.",
+        "description": "Set up a self-contained medication and medical-supply manager.\nYou can optionally create its integration-owned configuration page in the Home Assistant sidebar.",
         "data": {
           "setup_mode": "Initial setup",
           "show_sidebar_panel": "Show configuration page in the sidebar",
@@ -15,7 +15,7 @@
       },
       "owner": {
         "title": "Create the first owner",
-        "description": "The integration creates an owner device and medication calendar. Notification entity fields are optional and accept comma-separated notify entity IDs.",
+        "description": "The integration creates an owner device and medication calendar.\nNotification entity fields are optional and accept comma-separated notify entity IDs.",
         "data": {
           "name": "Owner name",
           "owner_id": "Owner ID (optional)",
@@ -35,7 +35,7 @@
     "step": {
       "init": {
         "title": "Medication Stock Manager options",
-        "description": "Configure the integration-owned sidebar page. Changes are applied when the integration reloads.",
+        "description": "Configure the integration-owned sidebar page.\nChanges are applied when the integration reloads.",
         "data": {
           "show_sidebar_panel": "Show Medication Stock in the sidebar",
           "sidebar_title": "Sidebar title",
@@ -49,6 +49,10 @@
     "set_sidebar_options": {
       "name": "Set sidebar options",
       "description": "Enable, disable, or customize the Medication Stock sidebar page."
+    },
+    "move_item": {
+      "name": "Move item",
+      "description": "Move an item up or down within its owner and medication/supply category."
     }
   }
 }

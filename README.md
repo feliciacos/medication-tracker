@@ -18,8 +18,8 @@ optional sidebar page.
 ## Features
 
 - Multiple owner profiles with optional Home Assistant Person association.
-- Medication and medical-supply items with custom units, icons, and explicit
-  `custom_med` or `custom_supply` categories.
+- Medication and medical-supply items with custom units, a searchable Home
+  Assistant icon picker, and explicit `custom_med` or `custom_supply` categories.
 - Manual, daily, selected-weekday, and every-X-days schedules.
 - Automatic stock deduction at configured times.
 - Configurable stock, warning threshold, package size, and usage values.
@@ -31,8 +31,11 @@ optional sidebar page.
 - Integration-owned read-only calendars for scheduled use, order dates, and
   run-out dates.
 - Integration-owned sensors, numbers, switches, buttons, calendars, and devices.
-- Bundled frontend card with stock tables, stock buttons, item configuration,
-  owner management, item creation, sidebar settings, and item details.
+- Bundled frontend card with stock tables, stock buttons, category-separated
+  item configuration, owner management, item creation, sidebar settings, and
+  item details.
+- Persistent per-owner ordering controls that keep medication and supplies in
+  their own sections.
 - Optional configurable Home Assistant sidebar panel.
 - UI config flow, options flow, config-entry migration, unload support, and
   removal cleanup.
@@ -127,8 +130,10 @@ After setup, use either the sidebar page or a normal dashboard card to:
 
 1. Create or edit owners.
 2. Create medication or medical-supply items.
-3. Configure schedules, stock values, reminders, and warning thresholds.
-4. Use the stock buttons to receive a box, mark an order, or adjust stock.
+3. Configure schedules, stock values, reminders, warning thresholds, and icons.
+4. Reorder items with the arrow controls inside their Medication or Supplies
+   section. Items cannot cross owner or category boundaries.
+5. Use the stock buttons to receive a box, mark an order, or adjust stock.
 
 Useful card examples are available in
 [`docs/CARD_CONFIGURATION_EXAMPLES.md`](docs/CARD_CONFIGURATION_EXAMPLES.md).
@@ -237,6 +242,38 @@ Remove it after troubleshooting to avoid excessive logs.
 - Personalized example dashboards are reference files and may require separate
   dashboard cards that are not dependencies of this integration.
 - Removing the config entry deletes integration-owned stored data by design.
+
+## Development and validation
+
+The repository keeps every runtime dependency under:
+
+```text
+custom_components/medication_stock_manager/
+```
+
+Run local checks:
+
+```bash
+python -m compileall custom_components/medication_stock_manager
+node --check custom_components/medication_stock_manager/frontend/medication-stock-manager-card.js
+python scripts/validate_repository.py
+```
+
+GitHub Actions runs both the HACS repository validator and Home Assistant
+hassfest. See [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md).
+
+## Versioning and releases
+
+This repository uses semantic versioning. The current prepared release is
+**1.5.0**.
+
+1. Commit and push the repository.
+2. Create and push the tag `v1.5.0`.
+3. Create a published GitHub release from that tag.
+4. Keep the manifest, Python constant, frontend constant, changelog, tag, and
+   release synchronized.
+
+See [`docs/RELEASING.md`](docs/RELEASING.md).
 
 ## License
 

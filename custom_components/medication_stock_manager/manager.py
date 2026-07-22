@@ -141,6 +141,8 @@ class MedicationStockManager:
             if item_id != old_id or item != old_item:
                 changed = True
         self.items = normalized_items
+        if self._normalize_display_orders():
+            changed = True
 
         if changed or not stored:
             await self.async_save()
@@ -706,6 +708,10 @@ class MedicationStockManager:
 
     async def async_update_item(self, item_id: str, data: dict[str, Any]) -> None:
         item = self._require_item(item_id)
+        previous_bucket = (
+            item.get("owner", ""),
+            self._item_category(str(item.get("item_type", "custom_med"))),
+        )
         if "stock" in data:
             item["stock"] = max(float(data["stock"]), 0)
         if "threshold" in data:
@@ -739,7 +745,20 @@ class MedicationStockManager:
             item["enabled"] = bool(data["enabled"])
         if "reminder_enabled" in data:
             item["reminder_enabled"] = bool(data["reminder_enabled"])
+
+        current_bucket = (
+            item.get("owner", ""),
+            self._item_category(str(item.get("item_type", "custom_med"))),
+        )
+        if current_bucket != previous_bucket:
+            item["display_order"] = self._next_display_order(
+                str(item.get("owner", "")),
+                str(item.get("item_type", "custom_med")),
+                exclude_item_id=item["id"],
+            )
+
         self._normalize_schedule(item)
+        self._normalize_display_orders()
         if not self.item_low(item):
             item["ordered"] = False
         self._ensure_item_device(dr.async_get(self.hass), item)
@@ -747,9 +766,59 @@ class MedicationStockManager:
         await self._check_low_transition(item)
         self.async_notify_listeners()
 
+    async def async_move_item(self, item_id: str, direction: str) -> None:
+        """Move an item within its owner and medication/supply category."""
+        item = self._require_item(item_id)
+        normalized_direction = str(direction).strip().lower()
+        if normalized_direction not in {"up", "down"}:
+            raise ValueError("Direction must be up or down")
+
+        owner = str(item.get("owner", ""))
+        category = self._item_category(
+            str(item.get("item_type", "custom_med"))
+        )
+        siblings = sorted(
+            (
+                candidate
+                for candidate in self.items.values()
+                if candidate.get("owner") == owner
+                and self._item_category(
+                    str(candidate.get("item_type", "custom_med"))
+                )
+                == category
+            ),
+            key=lambda candidate: (
+                int(candidate.get("display_order", 1000)),
+                str(candidate.get("name", "")).lower(),
+                str(candidate.get("id", "")),
+            ),
+        )
+        current_index = next(
+            (
+                index
+                for index, candidate in enumerate(siblings)
+                if candidate["id"] == item["id"]
+            ),
+            None,
+        )
+        if current_index is None:
+            return
+        target_index = current_index + (-1 if normalized_direction == "up" else 1)
+        if target_index < 0 or target_index >= len(siblings):
+            return
+
+        target = siblings[target_index]
+        item_order = int(item.get("display_order", 1000))
+        target_order = int(target.get("display_order", 1000))
+        item["display_order"], target["display_order"] = target_order, item_order
+        self._normalize_display_orders()
+        await self.async_save()
+        self.async_notify_listeners()
+
     async def async_remove_item(self, item_id: str) -> None:
         item = self._require_item(item_id)
         self.items.pop(item["id"], None)
+        self._normalize_display_orders()
         self._last_low.pop(item["id"], None)
         self.last_runs = {
             key: value
@@ -1281,18 +1350,51 @@ class MedicationStockManager:
             else "medication"
         )
 
-    def _next_display_order(self, owner: str, item_type: str) -> int:
+    def _next_display_order(
+        self,
+        owner: str,
+        item_type: str,
+        *,
+        exclude_item_id: str | None = None,
+    ) -> int:
         category = self._item_category(item_type)
         existing = [
             int(item.get("display_order", 0))
             for item in self.items.values()
             if item.get("owner") == owner
+            and item.get("id") != exclude_item_id
             and self._item_category(
                 str(item.get("item_type", "custom_med"))
             )
             == category
         ]
         return (max(existing) if existing else 0) + 10
+
+    def _normalize_display_orders(self) -> bool:
+        """Keep ordering stable and independent inside each owner/category bucket."""
+        changed = False
+        buckets: dict[tuple[str, str], list[dict[str, Any]]] = {}
+        for item in self.items.values():
+            key = (
+                str(item.get("owner", "")),
+                self._item_category(str(item.get("item_type", "custom_med"))),
+            )
+            buckets.setdefault(key, []).append(item)
+
+        for items in buckets.values():
+            items.sort(
+                key=lambda item: (
+                    int(item.get("display_order", 1000)),
+                    str(item.get("name", "")).lower(),
+                    str(item.get("id", "")),
+                )
+            )
+            for index, item in enumerate(items, start=1):
+                display_order = index * 10
+                if int(item.get("display_order", 0)) != display_order:
+                    item["display_order"] = display_order
+                    changed = True
+        return changed
 
     def summary_items(self) -> list[dict[str, Any]]:
         result: list[dict[str, Any]] = []

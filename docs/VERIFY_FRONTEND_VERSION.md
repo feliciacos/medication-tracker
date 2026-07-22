@@ -1,4 +1,4 @@
-# Verify frontend version 1.4.3
+# Verify frontend version 1.5.0
 
 Open the browser developer console and run:
 
@@ -11,14 +11,14 @@ customElements.get(
 Expected:
 
 ```text
-1.4.3
+1.5.0
 ```
 
 Verify the served source too:
 
 ```javascript
 fetch(
-  "/medication-stock-manager/medication-stock-manager-card.js?v=1.4.3"
+  "/medication-stock-manager/medication-stock-manager-card.js?v=1.5.0"
 )
   .then((response) => response.text())
   .then((text) =>
@@ -29,5 +29,5 @@ fetch(
 Expected:
 
 ```text
-1.4.3
+1.5.0
 ```

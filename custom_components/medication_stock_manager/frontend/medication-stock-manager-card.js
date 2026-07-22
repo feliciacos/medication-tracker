@@ -1,7 +1,7 @@
 const MSM_ENTITY = "sensor.medication_stock_manager";
 const MSM_CARD_TAG = "medication-stock-manager-card";
 const MSM_PANEL_TAG = "ha-panel-medication-stock-manager";
-const MSM_CARD_VERSION = "1.4.3";
+const MSM_CARD_VERSION = "1.5.0";
 
 const MSM_DAYS = [
   ["mon", "Mon"],
@@ -135,8 +135,7 @@ class MedicationStockManagerCard extends HTMLElement {
     }
 
     const active = this.shadowRoot.activeElement;
-    const editing =
-      active && ["INPUT", "SELECT", "TEXTAREA"].includes(active.tagName);
+    const editing = this._isEditorControl(active);
     if (editing) {
       this._pendingRender = true;
       return;
@@ -481,6 +480,15 @@ class MedicationStockManagerCard extends HTMLElement {
       </div>`;
   }
 
+  _isEditorControl(element) {
+    return Boolean(
+      element &&
+      ["INPUT", "SELECT", "TEXTAREA", "HA-ICON-PICKER"].includes(
+        element.tagName
+      )
+    );
+  }
+
   _captureUiState() {
     if (!this.shadowRoot.querySelector("ha-card")) return;
 
@@ -507,7 +515,7 @@ class MedicationStockManagerCard extends HTMLElement {
     });
 
     const active = this.shadowRoot.activeElement;
-    if (!active || !["INPUT", "SELECT", "TEXTAREA"].includes(active.tagName)) {
+    if (!this._isEditorControl(active)) {
       this._focusState = null;
       return;
     }
@@ -1141,13 +1149,13 @@ class MedicationStockManagerCard extends HTMLElement {
 
           <div class="field">
             <label>Sidebar icon</label>
-            <input
+            <ha-icon-picker
               data-sidebar-setting="sidebar_icon"
               value="${this._esc(
                 settings.sidebar_icon || "mdi:medical-bag"
               )}"
               placeholder="mdi:medical-bag"
-            >
+            ></ha-icon-picker>
           </div>
 
           <label class="sidebar-toggle">
@@ -1317,12 +1325,64 @@ class MedicationStockManagerCard extends HTMLElement {
   }
 
   _configurationSection(items) {
+    const medication = items.filter(
+      (item) => this._category(item) === "medication"
+    );
+    const supplies = items.filter(
+      (item) => this._category(item) === "supply"
+    );
+
+    const renderCategory = (categoryItems, title, icon, emptyMessage) => {
+      const movement = new Map();
+      categoryItems.forEach((item) => {
+        const siblings = categoryItems.filter(
+          (candidate) => candidate.owner === item.owner
+        );
+        const index = siblings.findIndex(
+          (candidate) => candidate.id === item.id
+        );
+        movement.set(item.id, {
+          canMoveUp: index > 0,
+          canMoveDown: index >= 0 && index < siblings.length - 1,
+        });
+      });
+
+      return `
+        <div class="configuration-category">
+          <div class="configuration-category-heading">
+            <ha-icon icon="${icon}"></ha-icon>
+            <h2>${this._esc(title)}</h2>
+            <span></span>
+          </div>
+          <div class="items">
+            ${categoryItems.length
+              ? categoryItems
+                  .map((item) =>
+                    this._itemEditor(item, movement.get(item.id))
+                  )
+                  .join("")
+              : `<div class="empty category-empty">${this._esc(emptyMessage)}</div>`}
+          </div>
+        </div>`;
+    };
+
     return `
       <section>
         ${this._bool("show_section_title", (this._config.view || "all") === "all") ? `<h2>${this._esc(this._config.section_title || "Item configuration")}</h2>` : ""}
-        ${this._bool("show_help", true) ? `<p class="section-note">Usage is the total amount used on each active day and is divided evenly over its configured times. A usage value of <strong>0</strong> is treated as manual.</p>` : ""}
-        <div class="items">
-          ${items.length ? items.map((item) => this._itemEditor(item)).join("") : `<div class="empty">No matching items.</div>`}
+        ${this._bool("show_help", true) ? `<p class="section-note">Usage is the total amount used on each active day and is divided evenly over its configured times. A usage value of <strong>0</strong> is treated as manual. Use the arrow controls to reorder items within the same owner and category.</p>` : ""}
+        <div class="configuration-categories">
+          ${renderCategory(
+            medication,
+            "Medication",
+            "mdi:pill",
+            "No medication items."
+          )}
+          ${renderCategory(
+            supplies,
+            "Supplies",
+            "mdi:medical-bag",
+            "No supply items."
+          )}
         </div>
       </section>`;
   }
@@ -1379,7 +1439,7 @@ class MedicationStockManagerCard extends HTMLElement {
     return fields.includes(field);
   }
 
-  _itemEditor(item) {
+  _itemEditor(item, movement = {}) {
     const mode = this._scheduleMode(item);
     const typeOptions = Object.keys(MSM_TYPES)
       .map((type) => `<option value="${type}" ${item.item_type === type ? "selected" : ""}>${this._esc(type.replaceAll("_", " "))}</option>`)
@@ -1399,14 +1459,38 @@ class MedicationStockManagerCard extends HTMLElement {
             <span class="status-dot ${item.low ? "low" : "ok"}"></span>
             <span><strong>${this._esc(item.name)}</strong><small>${this._esc(item.owner_name || this._ownerName(item.owner))} · ${this._esc(this._num(item.stock))} ${this._esc(item.unit)}</small></span>
           </div>
-          <span class="summary-status">${item.low ? (item.ordered ? "Check order" : "Order") : "OK"}</span>
+          <div class="summary-tools">
+            <span class="summary-status">${item.low ? (item.ordered ? "Check order" : "Order") : "OK"}</span>
+            <span class="reorder-controls" aria-label="Reorder ${this._esc(item.name)}">
+              <button
+                type="button"
+                class="reorder-button"
+                data-action="move-item"
+                data-id="${this._esc(item.id)}"
+                data-direction="up"
+                title="Move up within ${this._category(item) === "supply" ? "Supplies" : "Medication"}"
+                aria-label="Move ${this._esc(item.name)} up"
+                ${movement.canMoveUp ? "" : "disabled"}
+              ><ha-icon icon="mdi:arrow-up"></ha-icon></button>
+              <button
+                type="button"
+                class="reorder-button"
+                data-action="move-item"
+                data-id="${this._esc(item.id)}"
+                data-direction="down"
+                title="Move down within ${this._category(item) === "supply" ? "Supplies" : "Medication"}"
+                aria-label="Move ${this._esc(item.name)} down"
+                ${movement.canMoveDown ? "" : "disabled"}
+              ><ha-icon icon="mdi:arrow-down"></ha-icon></button>
+            </span>
+          </div>
         </summary>
         <div class="editor" data-editor="${this._esc(item.id)}" data-schedule-mode="${this._esc(mode)}">
           ${field("name", `<label>Name</label><input data-field="name" value="${this._esc(item.name)}">`, "wide")}
           ${field("owner", `<label>Owner</label><select data-field="owner">${ownerOptions}</select>`)}
           ${field("item_type", `<label>Type</label><select data-field="item_type">${typeOptions}</select>`)}
           ${field("unit", `<label>Unit / custom type</label><input data-field="unit" value="${this._esc(item.unit)}">`)}
-          ${field("icon", `<label>Icon</label><input data-field="icon" value="${this._esc(item.icon)}">`)}
+          ${field("icon", `<label>Icon</label><ha-icon-picker data-field="icon" value="${this._esc(item.icon)}" placeholder="mdi:pill"></ha-icon-picker>`)}
           ${field("stock", `<label>Current stock</label><input type="number" min="0" step="0.001" data-field="stock" value="${this._esc(this._num(item.stock))}">`, "metric-field")}
           ${field("threshold", `<label>Warning threshold</label><input type="number" min="0" step="0.001" data-field="threshold" value="${this._esc(this._num(item.threshold))}">`, "metric-field")}
           ${field("package_size", `<label>Package / box size</label><input type="number" min="0" step="0.001" data-field="package_size" value="${this._esc(this._num(item.package_size))}">`, "metric-field")}
@@ -1490,7 +1574,7 @@ class MedicationStockManagerCard extends HTMLElement {
         }
         <div class="field"><label>Type</label><select data-add="item_type">${Object.keys(MSM_TYPES).map((type) => `<option value="${type}" ${type === defaultType ? "selected" : ""}>${this._esc(type.replaceAll("_", " "))}</option>`).join("")}</select></div>
         <div class="field"><label>Unit / custom type</label><input data-add="unit" value="${this._esc(defaultUnit)}"></div>
-        <div class="field"><label>Icon</label><input data-add="icon" value="${this._esc(this._config.default_icon || "mdi:pill")}"></div>
+        <div class="field"><label>Icon</label><ha-icon-picker data-add="icon" value="${this._esc(this._config.default_icon || "mdi:pill")}" placeholder="mdi:pill"></ha-icon-picker></div>
         <div class="field metric-field"><label>Current stock</label><input type="number" min="0" step="0.001" data-add="stock" value="0"></div>
         <div class="field metric-field"><label>Warning threshold</label><input type="number" min="0" step="0.001" data-add="threshold" value="0"></div>
         <div class="field metric-field"><label>Package / box size</label><input type="number" min="0" step="0.001" data-add="package_size" value="0"></div>
@@ -1579,12 +1663,25 @@ class MedicationStockManagerCard extends HTMLElement {
         if (!this._pendingRender) return;
         setTimeout(() => {
           const active = this.shadowRoot.activeElement;
-          if (!active || !["INPUT", "SELECT", "TEXTAREA"].includes(active.tagName)) {
+          if (!this._isEditorControl(active)) {
             this._render();
           }
         }, 0);
       });
     });
+
+    this.shadowRoot
+      .querySelectorAll(
+        "ha-icon-picker[data-field], " +
+        "ha-icon-picker[data-add], " +
+        "ha-icon-picker[data-sidebar-setting]"
+      )
+      .forEach((picker) => {
+        picker.addEventListener("value-changed", (event) => {
+          picker.value = event.detail?.value || "";
+          this._rememberDraft({ target: picker });
+        });
+      });
 
     this.shadowRoot.querySelectorAll("button[data-action], [data-action].stock-modal-backdrop").forEach((button) => {
       button.addEventListener("click", (event) => this._handleAction(event));
@@ -1697,6 +1794,13 @@ class MedicationStockManagerCard extends HTMLElement {
       }
       if (action === "save") await this._saveItem(id);
       if (action === "add") await this._addItem();
+      if (action === "move-item") {
+        await this._service("move_item", {
+          item_id: id,
+          direction: button.dataset.direction,
+        });
+        this._setMessage("Item order updated.");
+      }
       if (action === "receive" && confirm("Add one received package to this item's stock?")) {
         const item = this._optimisticItem(id);
         if (item) {
@@ -2035,6 +2139,31 @@ class MedicationStockManagerCard extends HTMLElement {
       .muted, small { color: var(--secondary-text-color); }
       small { display: block; margin-top: 2px; font-weight: normal; }
       .items, .home-list { display: grid; gap: 10px; }
+      .configuration-categories { display: grid; gap: 24px; margin-top: 16px; }
+      .configuration-category { display: grid; gap: 10px; }
+      .configuration-category-heading {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 0 8px;
+      }
+      .configuration-category-heading h2 { margin: 0; white-space: nowrap; }
+      .configuration-category-heading ha-icon { --mdc-icon-size: 24px; }
+      .configuration-category-heading > span {
+        height: 5px;
+        border-radius: 5px;
+        background: color-mix(
+          in srgb,
+          var(--primary-text-color) 10%,
+          transparent
+        );
+        flex: 1;
+      }
+      .category-empty {
+        border: 1px dashed var(--divider-color);
+        border-radius: 14px;
+        color: var(--secondary-text-color);
+      }
       details.item, details.add-item, details.home-item { border: 1px solid var(--divider-color); border-radius: 14px; background: var(--ha-card-background, var(--card-background-color)); overflow: hidden; }
       details > summary { list-style: none; cursor: pointer; }
       details > summary::-webkit-details-marker { display: none; }
@@ -2043,7 +2172,21 @@ class MedicationStockManagerCard extends HTMLElement {
       .summary-main { display: flex; align-items: center; gap: 10px; min-width: 0; }
       .summary-main span:last-child { min-width: 0; }
       .summary-main strong { overflow-wrap: anywhere; }
+      .summary-tools { display: flex; align-items: center; gap: 10px; }
       .summary-status { color: var(--secondary-text-color); white-space: nowrap; }
+      .reorder-controls { display: inline-flex; gap: 4px; }
+      button.reorder-button {
+        width: 34px;
+        min-width: 34px;
+        min-height: 34px;
+        height: 34px;
+        padding: 0;
+        display: inline-grid;
+        place-items: center;
+        border-radius: 50%;
+      }
+      button.reorder-button ha-icon { --mdc-icon-size: 20px; }
+      button.reorder-button:disabled { cursor: default; opacity: .3; }
       .status-dot { width: 11px; height: 11px; border-radius: 50%; flex: 0 0 11px; }
       .status-dot.ok { background: var(--success-color, #43a047); }
       .status-dot.low { background: var(--error-color); }
@@ -2105,6 +2248,7 @@ class MedicationStockManagerCard extends HTMLElement {
       }
       label { font-size: .82rem; color: var(--secondary-text-color); }
       input, select, textarea { width: 100%; box-sizing: border-box; min-height: 42px; padding: 8px 10px; border: 1px solid var(--divider-color); border-radius: 10px; background: var(--card-background-color); color: var(--primary-text-color); font: inherit; }
+      ha-icon-picker { width: 100%; display: block; }
       input[type="checkbox"] { width: 18px; min-height: 18px; height: 18px; padding: 0; }
       .days { display: flex; flex-wrap: wrap; gap: 7px; }
       .day { display: flex; align-items: center; gap: 5px; border: 1px solid var(--divider-color); border-radius: 9px; padding: 7px 9px; color: var(--primary-text-color); }
@@ -2441,6 +2585,13 @@ class MedicationStockManagerCard extends HTMLElement {
           grid-column: 2;
         }
         .summary-status { display: none; }
+        .summary-tools { gap: 4px; }
+        button.reorder-button {
+          width: 38px;
+          min-width: 38px;
+          height: 38px;
+          min-height: 38px;
+        }
         details.home-item > summary { grid-template-columns: 40px minmax(0, 1fr); }
         .home-supply { grid-column: 2; }
       }

@@ -1,6 +1,6 @@
 # Fresh setup
 
-Medication Stock Manager 1.4.3 is self-contained. A new installation does not
+Medication Stock Manager 1.5.0 is self-contained. A new installation does not
 need `configuration.yaml`, packages, YAML automations, input helpers, Local
 Calendar, or files in `/config/www`.
 
@@ -39,7 +39,7 @@ stock sensor, number entities, switches, and action buttons.
 The integration serves its bundled frontend from:
 
 ```text
-/medication-stock-manager/medication-stock-manager-card.js?v=1.4.3
+/medication-stock-manager/medication-stock-manager-card.js?v=1.5.0
 ```
 
 It registers that module automatically. Do not add a second `/local/...`

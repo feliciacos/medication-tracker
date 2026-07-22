@@ -24,7 +24,7 @@ Use a specific configured owner ID when needed:
 ```yaml
 type: custom:medication-stock-manager-card
 view: stock_buttons
-owner: felicia
+owner: your_owner_id
 show_header: false
 ```
 
@@ -55,6 +55,11 @@ show_restore_defaults: true
 show_remove: true
 show_actions: true
 ```
+
+The card automatically renders separate `Medication` and `Supplies` sections.
+Each item has up/down arrow controls. Reordering is persisted by the integration
+and is limited to items with the same owner in the same section, so medication
+cannot be moved into Supplies and supplies cannot be moved into Medication.
 
 The red delete-all action permanently removes all items and their generated
 calendar events while retaining owner profiles.

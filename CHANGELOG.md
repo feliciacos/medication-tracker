@@ -5,6 +5,24 @@ All notable changes to this project are documented here. The project follows
 
 ## [Unreleased]
 
+## [1.5.0] - 2026-07-22
+
+### Added
+
+- Added Home Assistant's native searchable icon picker to existing-item, new-item, and
+  sidebar icon fields, while continuing to accept custom `mdi:` values.
+- Added separate `Medication` and `Supplies` sections to Medication & Item
+  Configuration.
+- Added persistent up/down ordering controls and a `move_item` service.
+
+### Changed
+
+- Item ordering is normalized independently for each owner and category.
+- Reordering is restricted to items belonging to the same owner and the same
+  medication/supply category.
+- Changing an item's owner or type places it at the end of the destination
+  category without disturbing unrelated items.
+
 ## [1.4.3] - 2026-07-16
 
 ### Added
@@ -89,3 +107,4 @@ All notable changes to this project are documented here. The project follows
 
 [1.4.2]: https://github.com/feliciacos/medication-tracker/releases/tag/v1.4.2
 [1.4.3]: https://github.com/feliciacos/medication-tracker/releases/tag/v1.4.3
+[1.5.0]: https://github.com/feliciacos/medication-tracker/releases/tag/v1.5.0
