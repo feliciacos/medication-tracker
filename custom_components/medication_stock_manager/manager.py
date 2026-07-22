@@ -821,7 +821,7 @@ class MedicationStockManager:
         target_item_id: str,
         position: str,
     ) -> None:
-        """Place an item before or after a compatible drag target."""
+        """Compatibility API to place an item before or after a matching target."""
         item = self._require_item(item_id)
         target = self._require_item(target_item_id)
         normalized_position = str(position).strip().lower()

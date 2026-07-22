@@ -106,7 +106,7 @@ vm.runInContext(source, context, { filename: frontendPath });
 
 const card = registry.get("medication-stock-manager-card");
 if (!card) throw new Error("Medication Stock Manager card did not register");
-if (card.prototype.msmVersion !== "1.5.2") {
+if (card.prototype.msmVersion !== "1.5.3") {
   throw new Error(`Unexpected frontend version: ${card.prototype.msmVersion}`);
 }
 if (!registry.get("ha-panel-medication-stock-manager")) {
@@ -114,6 +114,28 @@ if (!registry.get("ha-panel-medication-stock-manager")) {
 }
 if (rebuildEvents < 1) {
   throw new Error("Matching Lovelace error card did not receive ll-rebuild");
+}
+
+const testCard = new card();
+const testItems = [
+  { id: "med-a", owner: "owner-a", category: "medication", display_order: 0, name: "A" },
+  { id: "med-b", owner: "owner-a", category: "medication", display_order: 1, name: "B" },
+  { id: "supply-a", owner: "owner-a", category: "supply", display_order: 0, name: "Supply" },
+  { id: "other-owner", owner: "owner-b", category: "medication", display_order: 0, name: "Other" },
+];
+testCard._items = () => testItems;
+testCard._category = (item) => item.category;
+const firstAvailability = testCard._moveAvailability(testItems[0]);
+const secondAvailability = testCard._moveAvailability(testItems[1]);
+if (firstAvailability.canMoveUp || !firstAvailability.canMoveDown) {
+  throw new Error("First medication item has incorrect arrow availability");
+}
+if (!secondAvailability.canMoveUp || secondAvailability.canMoveDown) {
+  throw new Error("Last medication item has incorrect arrow availability");
+}
+const supplyAvailability = testCard._moveAvailability(testItems[2]);
+if (supplyAvailability.canMoveUp || supplyAvailability.canMoveDown) {
+  throw new Error("Supply arrow availability crossed category boundaries");
 }
 
 console.log(

@@ -1,7 +1,7 @@
 const MSM_ENTITY = "sensor.medication_stock_manager";
 const MSM_CARD_TAG = "medication-stock-manager-card";
 const MSM_PANEL_TAG = "ha-panel-medication-stock-manager";
-const MSM_CARD_VERSION = "1.5.2";
+const MSM_CARD_VERSION = "1.5.3";
 
 const MSM_DAYS = [
   ["mon", "Mon"],
@@ -244,7 +244,6 @@ class MedicationStockManagerCard extends HTMLElement {
     this._activeStockItemId = null;
     this._optimisticStock = new Map();
     this._optimisticOrdered = new Map();
-    this._dragState = null;
     this._viewportScrollLock = null;
     this._viewportScrollLockTimer = null;
     this._iconPickerReady = Boolean(
@@ -1610,7 +1609,7 @@ class MedicationStockManagerCard extends HTMLElement {
     return `
       <section>
         ${this._bool("show_section_title", (this._config.view || "all") === "all") ? `<h2>${this._esc(this._config.section_title || "Item configuration")}</h2>` : ""}
-        ${this._bool("show_help", true) ? `<p class="section-note">Usage is the total amount used on each active day and is divided evenly over its configured times. A usage value of <strong>0</strong> is treated as manual. Drag the handle to reorder items within the same owner and category.</p>` : ""}
+        ${this._bool("show_help", true) ? `<p class="section-note">Usage is the total amount used on each active day and is divided evenly over its configured times. A usage value of <strong>0</strong> is treated as manual. Use the arrow buttons to move items within the same owner and category.</p>` : ""}
         <div class="configuration-categories">
           ${renderCategory(
             medication,
@@ -1680,8 +1679,37 @@ class MedicationStockManagerCard extends HTMLElement {
     return fields.includes(field);
   }
 
+  _moveAvailability(item) {
+    const category = this._category(item);
+    const siblings = this._items()
+      .filter(
+        (candidate) =>
+          candidate.owner === item.owner &&
+          this._category(candidate) === category
+      )
+      .sort((left, right) => {
+        const orderDifference =
+          Number(left.display_order ?? 1000) -
+          Number(right.display_order ?? 1000);
+        if (orderDifference) return orderDifference;
+        const nameDifference = String(left.name || "").localeCompare(
+          String(right.name || ""),
+          undefined,
+          { sensitivity: "base" }
+        );
+        if (nameDifference) return nameDifference;
+        return String(left.id || "").localeCompare(String(right.id || ""));
+      });
+    const index = siblings.findIndex((candidate) => candidate.id === item.id);
+    return {
+      canMoveUp: index > 0,
+      canMoveDown: index >= 0 && index < siblings.length - 1,
+    };
+  }
+
   _itemEditor(item) {
     const mode = this._scheduleMode(item);
+    const { canMoveUp, canMoveDown } = this._moveAvailability(item);
     const typeOptions = Object.keys(MSM_TYPES)
       .map((type) => `<option value="${type}" ${item.item_type === type ? "selected" : ""}>${this._esc(type.replaceAll("_", " "))}</option>`)
       .join("");
@@ -1708,16 +1736,28 @@ class MedicationStockManagerCard extends HTMLElement {
           </div>
           <div class="summary-tools">
             <span class="summary-status">${item.low ? (item.ordered ? "Check order" : "Order") : "OK"}</span>
-            <span
-              class="drag-handle"
-              role="button"
-              tabindex="0"
-              data-drag-id="${this._esc(item.id)}"
-              data-drag-owner="${this._esc(item.owner)}"
-              data-drag-category="${this._esc(this._category(item))}"
-              title="Drag to reorder within this owner's ${this._category(item) === "supply" ? "Supplies" : "Medication"} section"
-              aria-label="Drag ${this._esc(item.name)} to reorder"
-            ><ha-icon icon="mdi:drag-vertical"></ha-icon></span>
+            <span class="move-controls" role="group" aria-label="Reorder ${this._esc(item.name)}">
+              <button
+                type="button"
+                class="move-button"
+                data-action="move-item"
+                data-id="${this._esc(item.id)}"
+                data-direction="up"
+                title="Move up"
+                aria-label="Move ${this._esc(item.name)} up"
+                ${canMoveUp ? "" : "disabled"}
+              ><ha-icon icon="mdi:chevron-up"></ha-icon></button>
+              <button
+                type="button"
+                class="move-button"
+                data-action="move-item"
+                data-id="${this._esc(item.id)}"
+                data-direction="down"
+                title="Move down"
+                aria-label="Move ${this._esc(item.name)} down"
+                ${canMoveDown ? "" : "disabled"}
+              ><ha-icon icon="mdi:chevron-down"></ha-icon></button>
+            </span>
           </div>
         </summary>
         <div class="editor" data-editor="${this._esc(item.id)}" data-schedule-mode="${this._esc(mode)}">
@@ -1885,8 +1925,6 @@ class MedicationStockManagerCard extends HTMLElement {
       this._addItemOpen = addDetails.open;
     });
 
-    this._bindItemDragAndDrop();
-
     this.shadowRoot.querySelectorAll(".editor").forEach((editor) => {
       editor.addEventListener("input", (event) => {
         this._rememberDraft(event);
@@ -1987,202 +2025,6 @@ class MedicationStockManagerCard extends HTMLElement {
     });
   }
 
-  _bindItemDragAndDrop() {
-    const handles = this.shadowRoot.querySelectorAll(
-      ".drag-handle[data-drag-id]"
-    );
-
-    handles.forEach((handle) => {
-      handle.addEventListener("click", (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-      });
-      handle.addEventListener("keydown", async (event) => {
-        if (!["ArrowUp", "ArrowDown"].includes(event.key)) return;
-        event.preventDefault();
-        event.stopPropagation();
-        try {
-          await this._service("move_item", {
-            item_id: handle.dataset.dragId,
-            direction: event.key === "ArrowUp" ? "up" : "down",
-          });
-          this._setMessage("Item order updated.");
-        } catch (error) {
-          this._setMessage(
-            error?.message || "The reorder failed.",
-            "error"
-          );
-        }
-      });
-
-      handle.addEventListener("pointerdown", (event) => {
-        if (!event.isPrimary || event.button !== 0) return;
-        const item = handle.closest("details.item");
-        if (!item) return;
-        event.preventDefault();
-        event.stopPropagation();
-        this._clearItemDragState();
-        this._dragState = {
-          itemId: handle.dataset.dragId,
-          owner: handle.dataset.dragOwner,
-          category: handle.dataset.dragCategory,
-          targetId: null,
-          position: null,
-          pointerId: event.pointerId,
-          startX: event.clientX,
-          startY: event.clientY,
-          active: false,
-          source: item,
-          handle,
-        };
-        try {
-          handle.setPointerCapture(event.pointerId);
-        } catch (_error) {
-          // Pointer capture is optional; window-level movement still works.
-        }
-      });
-
-      handle.addEventListener("pointermove", (event) => {
-        const state = this._dragState;
-        if (!state || state.pointerId !== event.pointerId) return;
-        event.preventDefault();
-        event.stopPropagation();
-
-        if (!state.active) {
-          const distance = Math.hypot(
-            event.clientX - state.startX,
-            event.clientY - state.startY
-          );
-          if (distance < 5) return;
-          state.active = true;
-          state.source?.classList.add("dragging");
-          state.handle?.classList.add("dragging");
-        }
-
-        const placement = this._dragTargetAtPoint(event.clientY);
-        this._clearDropIndicators();
-        state.targetId = placement?.target?.dataset?.itemId || null;
-        state.position = placement?.position || null;
-        if (placement) {
-          placement.target.classList.add(`drop-${placement.position}`);
-        }
-      });
-
-      const finishPointerDrag = async (event, cancelled = false) => {
-        const state = this._dragState;
-        if (!state || state.pointerId !== event.pointerId) return;
-        event.preventDefault();
-        event.stopPropagation();
-        try {
-          if (handle.hasPointerCapture?.(event.pointerId)) {
-            handle.releasePointerCapture(event.pointerId);
-          }
-        } catch (_error) {
-          // The browser may already have released capture.
-        }
-
-        const request = {
-          itemId: state.itemId,
-          targetId: state.targetId,
-          position: state.position,
-          active: state.active,
-        };
-        const viewportLock =
-          request.active && request.targetId && request.position
-            ? this._beginViewportScrollLock()
-            : null;
-        this._clearItemDragState();
-        if (
-          cancelled ||
-          !request.active ||
-          !request.targetId ||
-          !request.position
-        ) {
-          return;
-        }
-
-        try {
-          await this._service("reorder_item", {
-            item_id: request.itemId,
-            target_item_id: request.targetId,
-            position: request.position,
-          });
-          this._setMessage("Item order updated.");
-        } catch (error) {
-          console.error(error);
-          this._setMessage(
-            error?.message || "The reorder failed.",
-            "error"
-          );
-        } finally {
-          this._finishViewportScrollLock(viewportLock);
-        }
-      };
-
-      handle.addEventListener("pointerup", (event) => {
-        finishPointerDrag(event, false);
-      });
-      handle.addEventListener("pointercancel", (event) => {
-        finishPointerDrag(event, true);
-      });
-    });
-  }
-
-  _dragTargetAtPoint(clientY) {
-    if (!this._dragState) return null;
-    const candidates = [
-      ...this.shadowRoot.querySelectorAll(
-        "details.item[data-item-id]"
-      ),
-    ]
-      .filter((target) => this._canDropOnItem(target))
-      .map((target) => ({
-        target,
-        rect: target.getBoundingClientRect(),
-      }))
-      .sort((left, right) => left.rect.top - right.rect.top);
-
-    if (!candidates.length) return null;
-    for (const candidate of candidates) {
-      if (clientY < candidate.rect.top + candidate.rect.height / 2) {
-        return { target: candidate.target, position: "before" };
-      }
-    }
-    return {
-      target: candidates[candidates.length - 1].target,
-      position: "after",
-    };
-  }
-
-  _canDropOnItem(target) {
-    return Boolean(
-      this._dragState &&
-      target?.dataset?.itemId &&
-      target.dataset.itemId !== this._dragState.itemId &&
-      target.dataset.itemOwner === this._dragState.owner &&
-      target.dataset.itemCategory === this._dragState.category
-    );
-  }
-
-  _clearDropIndicators() {
-    this.shadowRoot
-      .querySelectorAll("details.item.drop-before, details.item.drop-after")
-      .forEach((item) =>
-        item.classList.remove("drop-before", "drop-after")
-      );
-  }
-
-  _clearItemDragState() {
-    this._clearDropIndicators();
-    this.shadowRoot
-      .querySelectorAll("details.item.dragging")
-      .forEach((item) => item.classList.remove("dragging"));
-    this.shadowRoot
-      .querySelectorAll(".drag-handle.dragging")
-      .forEach((handle) => handle.classList.remove("dragging"));
-    this._dragState = null;
-  }
-
   _handleScheduleInput(editor, control) {
     const isNew = editor.dataset.editor === "new";
     const prefix = isNew ? "add" : "field";
@@ -2225,6 +2067,7 @@ class MedicationStockManagerCard extends HTMLElement {
     const button = event.currentTarget;
     const action = button.dataset.action;
     const id = button.dataset.id;
+    let viewportLock = null;
 
     try {
       if ("disabled" in button) button.disabled = true;
@@ -2242,6 +2085,7 @@ class MedicationStockManagerCard extends HTMLElement {
       if (action === "save") await this._saveItem(id);
       if (action === "add") await this._addItem();
       if (action === "move-item") {
+        viewportLock = this._beginViewportScrollLock();
         await this._service("move_item", {
           item_id: id,
           direction: button.dataset.direction,
@@ -2332,6 +2176,7 @@ class MedicationStockManagerCard extends HTMLElement {
       console.error(error);
       this._setMessage(error?.message || "The action failed.", "error");
     } finally {
+      if (viewportLock) this._finishViewportScrollLock(viewportLock);
       if ("disabled" in button) button.disabled = false;
     }
   }
@@ -2621,20 +2466,27 @@ class MedicationStockManagerCard extends HTMLElement {
       .summary-main strong { overflow-wrap: anywhere; }
       .summary-tools { display: flex; align-items: center; gap: 10px; }
       .summary-status { color: var(--secondary-text-color); white-space: nowrap; }
-      .drag-handle {
-        width: 36px;
-        min-width: 36px;
-        height: 36px;
+      .move-controls {
+        display: inline-flex;
+        align-items: center;
+        gap: 2px;
+        flex: 0 0 auto;
+      }
+      button.move-button {
+        width: 34px;
+        min-width: 34px;
+        height: 34px;
+        padding: 0;
         display: inline-grid;
         place-items: center;
+        border: 0;
         border-radius: 50%;
+        background: transparent;
         color: var(--secondary-text-color);
-        cursor: grab;
-        touch-action: none;
-        user-select: none;
+        cursor: pointer;
       }
-      .drag-handle:hover,
-      .drag-handle:focus-visible {
+      button.move-button:hover:not(:disabled),
+      button.move-button:focus-visible:not(:disabled) {
         color: var(--primary-text-color);
         background: color-mix(
           in srgb,
@@ -2643,26 +2495,17 @@ class MedicationStockManagerCard extends HTMLElement {
         );
         outline: none;
       }
-      .drag-handle:active,
-      .drag-handle.dragging { cursor: grabbing; color: var(--primary-color); }
-      .drag-handle ha-icon { --mdc-icon-size: 24px; pointer-events: none; }
-      details.item.dragging { opacity: .45; }
-      details.item.drop-before,
-      details.item.drop-after { position: relative; }
-      details.item.drop-before::before,
-      details.item.drop-after::after {
-        content: "";
-        position: absolute;
-        left: 12px;
-        right: 12px;
-        height: 4px;
-        border-radius: 4px;
-        background: var(--primary-color);
-        z-index: 2;
+      button.move-button:active:not(:disabled) {
+        color: var(--primary-color);
+      }
+      button.move-button:disabled {
+        opacity: .28;
+        cursor: default;
+      }
+      button.move-button ha-icon {
+        --mdc-icon-size: 23px;
         pointer-events: none;
       }
-      details.item.drop-before::before { top: 0; }
-      details.item.drop-after::after { bottom: 0; }
       .status-dot { width: 11px; height: 11px; border-radius: 50%; flex: 0 0 11px; }
       .status-dot.ok { background: var(--success-color, #43a047); }
       .status-dot.low { background: var(--error-color); }
@@ -3074,10 +2917,10 @@ class MedicationStockManagerCard extends HTMLElement {
         }
         .summary-status { display: none; }
         .summary-tools { gap: 4px; }
-        .drag-handle {
-          width: 42px;
-          min-width: 42px;
-          height: 42px;
+        button.move-button {
+          width: 38px;
+          min-width: 38px;
+          height: 38px;
         }
         details.home-item > summary { grid-template-columns: 40px minmax(0, 1fr); }
         .home-supply { grid-column: 2; }
@@ -3498,7 +3341,6 @@ function msmRefreshExistingFrontendInstances() {
         }
       });
       root.querySelectorAll(MSM_CARD_TAG).forEach((card) => {
-        card._dragState = null;
         card._iconPickerReady = Boolean(
           customElements.get("ha-icon-picker")
         );

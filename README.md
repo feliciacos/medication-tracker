@@ -268,10 +268,10 @@ hassfest. See [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md).
 ## Versioning and releases
 
 This repository uses semantic versioning. The current prepared release is
-**1.5.2**.
+**1.5.3**.
 
 1. Commit and push the repository.
-2. Create and push the tag `v1.5.2`.
+2. Create and push the tag `v1.5.3`.
 3. Create a published GitHub release from that tag.
 4. Keep the manifest, Python constant, frontend constant, changelog, tag, and
    release synchronized.

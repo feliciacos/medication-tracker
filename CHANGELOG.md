@@ -5,6 +5,24 @@ All notable changes to this project are documented here. The project follows
 
 ## [Unreleased]
 
+## [1.5.3] - 2026-07-22
+
+### Changed
+
+- Replaced pointer-based drag-and-drop ordering with dedicated up and down arrow
+  buttons on every item in Medication & Item Configuration.
+- Disabled the up button for the first item and the down button for the last item
+  in each owner/category group.
+- Kept movement limited to the same owner and Medication or Supplies category
+  through the existing backend `move_item` validation.
+
+### Fixed
+
+- Removed all pointer-capture and drop-indicator state, eliminating stuck drag
+  bars when the pointer leaves the browser or a gesture is interrupted.
+- Preserved the current dashboard/sidebar scroll position across arrow moves and
+  the resulting manager-state and confirmation-message renders.
+
 ## [1.5.2] - 2026-07-22
 
 ### Fixed
@@ -157,3 +175,5 @@ All notable changes to this project are documented here. The project follows
 [1.5.1]: https://github.com/feliciacos/medication-tracker/releases/tag/v1.5.1
 
 [1.5.2]: https://github.com/feliciacos/medication-tracker/releases/tag/v1.5.2
+
+[1.5.3]: https://github.com/feliciacos/medication-tracker/releases/tag/v1.5.3

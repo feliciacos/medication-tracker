@@ -127,7 +127,7 @@ def main() -> int:
     if '("move_item", move_item, MOVE_ITEM_SCHEMA)' not in init_text:
         fail("move_item compatibility service registration is missing")
     if '("reorder_item", reorder_item, REORDER_ITEM_SCHEMA)' not in init_text:
-        fail("reorder_item drag service registration is missing")
+        fail("reorder_item compatibility service registration is missing")
     manager_text = (INTEGRATION / "manager.py").read_text(encoding="utf-8")
     if "async def async_move_item" not in manager_text:
         fail("manager async_move_item compatibility implementation is missing")
@@ -139,20 +139,32 @@ def main() -> int:
         "msm-icon-picker-fallback",
         "configuration-category-heading",
         "stock-button-heading",
-        "drag-handle",
-        'handle.addEventListener("pointerdown"',
-        "_dragTargetAtPoint",
-        'this._service("reorder_item"',
+        "move-controls",
+        "move-button",
+        'data-action="move-item"',
+        'data-direction="up"',
+        'data-direction="down"',
+        'this._service("move_item"',
+        "_moveAvailability",
         "msmRefreshExistingFrontendInstances",
         "_beginViewportScrollLock",
         "_finishViewportScrollLock",
         "msmRepairMissingLovelaceCards",
         'new CustomEvent("ll-rebuild"',
-        "details.item.drop-before::before { top: 0; }",
-        "details.item.drop-after::after { bottom: 0; }",
     ):
         if marker not in frontend_text:
             fail(f"Frontend feature marker missing: {marker}")
+
+    for forbidden_marker in (
+        "drag-handle",
+        "_bindItemDragAndDrop",
+        "_dragTargetAtPoint",
+        'handle.addEventListener("pointerdown"',
+        "details.item.drop-before",
+        "details.item.drop-after",
+    ):
+        if forbidden_marker in frontend_text:
+            fail(f"Removed drag frontend marker is still present: {forbidden_marker}")
 
     for path in sorted(INTEGRATION.rglob("*.py")):
         py_compile.compile(str(path), doraise=True)
